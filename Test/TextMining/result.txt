@@ -1,0 +1,11 @@
+Mietvertrag: 12
+Exposé: 12
+Nebenkosten: 10
+Balkon: 9
+Aufzug: 4
+Obergeschoss: 3
+Barrierefreiheit: 2
+Keller: 2
+Fenster: 2
+Fußbodenheizung: 1
+----------------------------
