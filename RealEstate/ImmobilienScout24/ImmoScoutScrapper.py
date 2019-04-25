@@ -15,7 +15,7 @@ def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
-class ImmoScout_MainPage:
+class ImmoScoutScrapper:
 
     def __init__(self, url):
         self.__url = url
