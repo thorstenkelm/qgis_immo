@@ -20,14 +20,8 @@ class TextMiner:
 
         for line in file:
             line = line.rstrip("\n")
-            words = line.split(",")
-            # letztes element entfernen falls leer
-            if words[-1] == "":
-                words.remove(words[-1])
-            # zu filter_set hinzufuegen
-            for word in words:
-                word = word.strip()
-                filter_set.add(word)
+            line = line.strip()
+            filter_set.add(line)
         file.close()
         return filter_set
 
@@ -94,20 +88,19 @@ class TextMiner:
                                     min_len=2,
                                     max_len=3)
 
-        #Stopwörter löschen
+        #Stoppwörter löschen
         stop_words = set(stopwords.words('german'))
         self.remove_stopwords(tokenized_text, stop_words)
         return zip(tokenized_text, ngrams)
 
     @staticmethod
-    def filter_nouns(text, local_counter):
+    def filter_nouns(text):
         """
         Treetagger
         :param text:
-        :param local_counter:
         :return:
         """
-        tagger = treetaggerwrapper.TreeTagger(TAGLANG='en')
+        tagger = treetaggerwrapper.TreeTagger(TAGLANG='de')
         tags = []
         for sent in text:
             tags += tagger.tag_text(sent, tagonly=True)
@@ -151,7 +144,7 @@ class TextMiner:
             local_counter = Counter()
 
             tokenized_text, ngrams = zip(*self.prepare_description(text))
-            nouns = self.filter_nouns(tokenized_text, local_counter)
+            nouns = self.filter_nouns(tokenized_text)
 
             # Schnittmenge aus 'nomen' und 'filter_set' bilden
             result_nouns = nouns.intersection(self.filter)

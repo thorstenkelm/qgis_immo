@@ -1,15 +1,244 @@
-Alarmanlage, Altbau, Alternative Energien, Anlieger, Arbeitszimmer, Architekt, Asbest, Aufzug, Balkon, Bankbürgschaft, Barrierefreiheit,
-Baugerüst, Bauherr, Bauträger, Besichtigung, Blockheizkraftwerk, Brandhemmende Baustoffe, Brauchwasser, Briefkasten, Carport, Courtage,
-Dachsanierung, Dachgeschoss, Dachschräge, Dachterrasse, Dämmung, Darlehen, Denkmalschutz, Doppelhaus-Hälfte, Doppelverglasung, Eigenbedarf,
-Eigentümergemeinschaft, Eigentumswohnung, Einfamilienhaus, Einheitliche, Fassadengestaltung, Einstiegsfreies Bad, Emissions-bzw.Abgasnormen,
-Energetische Sanierung, Energieausweis, Energiesparmaßnahmen, Erbpacht, Erschließungskosten, Exposé, Fachwerkhaus, Fahrradkeller, Fenster,
-Fernwärms, Fertighaus, Feuerversicherung, Fußbodenheizung, Garage, Gartenbeleuchtung, Gartennutzung, Gartenplanung, Gaube, Gebäudeversicherung,
-Geothermie, Gewerbe im Privathaus, Gewerblich genutzte Immobilien, Gewerk, Grundbuchauszug, Grunderwerbsteuer, Grundfläche, Grundschuld,
-Grundschuldlöschung, Grundsteuer, Grundstück, Grundstücksgrenze, Hausnummer, Haustiere, Hausverwaltung, Heizen mit Holz, Hobbykeller,
-Hypothek, Hypothekenbank, Immobilie, Immobilie vererben, Immobilienbewertung, Immobilienvermarktung, Innenausbau, Intelligente Gebäudetechnik,
-Kamin, Kaminholzlagerung, Kaution, Keller, Kernsanierung, Kinderlärm, Kündigungsfristen, Kunst am Bau, Leuchtreklame, Loggia, Lüften, Makler,
-Maler-und Lackiererarbeiten, Massivhaus, Mehrfamilienhaus, Mieterhöhung, Mietminderung, Mietvertrag, Mülltonnen, Musterhaus, Nachmieter,
-Nebenkosten, Nebenkostenabrechnung, Neubau, Niedrigenergiehaus, Obergeschoss, Passivhaus, Provision, Renovierung, Rohbau, Rollstuhlgerechtes Wohnen,
-Schaltplan, Schimmel, Schlüsselfertige Übergabe, Schönheitsreparaturen, Schornsteinfeger, Seniorenwohnung, Statik, Staatliche Förderung,
-Starkstromanschluss, Steckdosen, Teilungserklärung, Terrasse, Tiefgarage, Tilgung, Treppenhaus, Trockenbau, Umzug, Wäschekeller, Wegerecht,
-Wintergarten, Winterräumpflicht, Wohnfläche, Wohnungsbaugesellschaften, Zwangsversteigerung
+Abbruchkosten
+Abschreibung
+Abstandszahlung
+Alarmanlage
+Altbau
+Alternative Energien
+Anlieger
+Apartment
+Arbeitszimmer
+Asbest
+Außenprovision
+Auflassung
+Aufzug
+Balkon
+Bankbürgschaft
+Barrierefreiheit
+Baugerüst
+Baugrenze
+BaugrunduntersuchungBauland
+Baulast
+Baulastenverzeichnis
+Bauschäden
+Bauvorlage
+Beleihung
+Beleihungsgrenze
+Beleihungswert
+Beschränkt persönliche Dienstbarkeit
+Betriebskosten
+Beurkundung
+Bewertungsgesetz
+Bewirtschaftungskosten
+Bezugsfertigkeit
+Blockheizkraftwerk
+Bodengutachten
+Bodenrichtwert
+Bonität
+Brandhemmende Baustoffe
+Brauchwasser
+Briefkasten
+Carport
+City Apartment
+Concierge
+Courtage
+Dämmung
+Dachgeschoss
+Dachgeschosswohnung
+Dachsanierung
+Dachschräge
+Dachterrasse
+DatenschutzDenkmalschutz
+Doppelhaus Hälfte
+Doppelhaus-Hälfte
+Doppelverglasung
+Eigenbedarf
+Eigenkapital
+Eigentümergemeinschaft
+EigentumsvormerkungEigentumswohnung
+Einfache Lage
+Einfamilienhaus
+Einstiegsfreies Bad
+Energetische Sanierung
+Energieausweis
+Energiepass
+EnergiesparmaßnahmenErbpacht
+Erker
+Erschließungskosten
+Ertragswertverfahren
+Erwerbskosten
+Fachwerkhaus
+Fahrradkeller
+Fair Value
+FassadengestaltungFenster
+Fernwärms
+Fertighaus
+Feuerversicherung
+Finanzierungsplan
+Flurbereinigung
+Flurkarte
+Flurstück
+Französischer Balkon
+Fremdgeldkonto
+Fremdkapital
+Fußbodenheizung
+Galerie
+Garage
+Gartenbeleuchtung
+Gartennutzung
+Gartenplanung
+Gaube
+Gebäudeversicherung
+Gebäudewertermittlung
+Gemeiner Wert
+Gemeinschaftseigentum
+Gemeinschaftsordnung
+Gemengelage
+Geothermie
+Gewerbe im Privathaus
+Gewerblich genutzte Immobilien
+Gewerk
+Gleitender Neuwertfaktor
+Grünland
+Grundbesitzssteuer
+Grundbuchauszug
+Grunddienstbarkeit
+Grunderwerbsteuer
+Grundfläche
+Grundschuld
+Grundschuldlöschung
+Grundstücksfläche
+Grundstücksgrenze
+Grundstücksmarktbericht
+Grundstückswertermittlung
+Grundsteuer
+Gute Lage
+Hausbewertung
+Hausgeld
+Hausgeldabrechnung
+Hausgutachten
+Hausnummer
+Hausordnung
+Haustiere
+Hausverwaltung
+Heizen mit Holz
+Hobbykeller
+Hypothek
+Immobilienbörse
+Immobiliengutachten
+Immobilienwertermittlungsverordnung
+Innenausbau
+Innenprovision
+Instandhaltungskosten
+Instandhaltungsrücklage
+Intelligente Gebäudetechnik
+Jahresabrechnung
+Kündigungsfristen
+Kamin
+Kaminholzlagerung
+Kapitalanlage
+Kaufvertrag
+Kaution
+Keller
+Kernsanierung
+Kinderlärm
+Kubatur
+Kunst am Bau
+Lageplan
+Lebensdauer
+Leuchtreklame
+Liegenschaftskataster
+Liegenschaftszinssatz
+Loft
+Loggia
+Luxusimmobilien
+Möblierte Wohnung
+Mülltonnen
+Maisonette-Wohnung
+Makler
+Makler- und Bauträgerverordnung
+Maler-und Lackiererarbeiten
+Massivhaus
+Mehrfamilienhaus
+Merkantiler Minderwert
+Mietdatenbank
+Mieterhöhung
+Mietkaution
+Mietminderung
+Mietpreis
+Mietspiegel
+Mietvertrag
+Mittlere Lage
+Nachbarschaft
+Nachmieter
+Nebenkosten
+Nebenkostenabrechnung
+Nettogrundfläche
+Neubau
+Niedrigenergiehaus
+Notar
+Obergeschoss
+Obhutspflicht des Mieters
+Ortsübliche Miete
+Parterre
+Passivhaus
+Patio
+Penthouse
+Pflichten des Wohneigentümers
+Pied-a-terreProvision
+ProvisionQualifizierter Mehrheitsbeschluss
+Rauchmelder
+Reallast
+Rendite
+Renovierung
+Rohbau
+Rollstuhlgerechtes Wohnen
+Sachwertverfahren
+Schönheitsreparaturen
+Schaltplan
+Schimmel
+Schlüsselfertige Übergabe
+Schornsteinfeger
+Schufa
+Seniorenwohnung
+Serviced Apartment
+Serviced-Living-Concept
+Sondereigentum
+Sondereigentumsverwaltung
+Sondernutzungsrecht
+Sonderumlage
+Souterrain
+Staatliche Förderung
+Starkstromanschluss
+Statik
+Steckdosen
+Studio
+Teileigentum
+Teilungserklärung
+Terrasse
+Tiefgarage
+Treppenhaus
+Trockenbau
+Umlage von Betriebskosten
+Umzug
+Unbedenklichkeitsbescheinigung
+Veränderungssperre
+Vergleichsmiete
+Vergleichswertverfahren
+Verkausfolge-Management
+Verkehrswert
+Versicherungsnachweis
+Verwaltervertrag
+Wäschekeller
+Wegerecht
+Wertsteigerung
+Wintergarten
+Winterräumpflicht
+Wohnfläche
+Wohngeld
+Wohnungsbaugesellschaften
+Wohnungseigentumsgesetz
+Zahlungsplan
+Zentrale Lage
+Zentrumsnah
+Zinsabschlag
+Zwangsversteigerung
