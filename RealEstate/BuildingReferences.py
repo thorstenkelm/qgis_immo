@@ -1,18 +1,40 @@
 # -*- coding: utf-8 -*-
 # Author: Thorsten Kelm, thorsten.kelm@hs-bochum.de
 
+import urllib.request
+import zipfile
 from dfply import *
+
 
 
 class BuildingReferences:
 
+    #Konstruktor, der die Funktionen read_data, read_keys und get_city_key aufruft
     def __init__(self, gebref_path, gebref_keys_path, studyarea):
+        self.download_data()
         self.__studyarea = studyarea
         self.__gebref_keys = self.read_keys(gebref_keys_path)
         self.__city_key = self.get_city_key()
         self.__gebref = self.read_data(gebref_path)
 
+
+
+    def download_data (self):
+        print("Beginning file download...")
+        url = 'https://www.opengeodata.nrw.de/produkte/geobasis/lika/alkis_sek/gebref/gebref_EPSG4647_ASCII.zip'
+        save = 'C:/Users/Fabian Hannich/Desktop/gebref.zip'
+        urllib.request.urlretrieve(url, save)
+        print("..download ends!")
+
+        print("Unpack data...")
+        extractTo = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/"
+        zipfile.ZipFile(save, 'r').extractall(extractTo)
+        print("Data ready!")
+
+
+    #read gebref-data and assign type
     def read_data(self, gebref_path):
+        print("Read, filter and encoding gebref_data..")
         gebref_data = pd.read_csv(gebref_path,
                                   sep=';',
                                   decimal=',',
@@ -24,17 +46,27 @@ class BuildingReferences:
                                   dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
                                          'adz': str, 'east': float, 'north': float, 'stn': str},
                                   encoding='ISO-8859-1')
+
+        #fill empty lines
         gebref_data.fillna('', inplace=True)
 
-        gebref_data = gebref_data >> mask(X.lan == self.__city_key['lan'].values[0],
-                                          X.rbz == self.__city_key['rbz'].values[0],
-                                          X.krs == self.__city_key['krs'].values[0],
-                                          X.gmd == self.__city_key['gmd'].values[0])
+        #text encoding
+        gebref_bearbeitet = gebref_data.replace("str.", "str", regex=True).replace("Str.", "str", regex=True)\
+            .replace("Ã¼", "ue", regex=True).replace("Ã¤", "ae", regex=True).replace("Ã¶", "oe", regex=True).replace("Ã", "ss", regex=True)
 
-        return gebref_data
+        #filter the gebref_data
+        gebref_bearbeitet = gebref_bearbeitet >> mask(X.lan == self.__city_key['lan'].values[0],
+                                                      X.rbz == self.__city_key['rbz'].values[0],
+                                                      X.krs == self.__city_key['krs'].values[0],
+                                                      X.gmd == self.__city_key['gmd'].values[0])
 
+        return gebref_bearbeitet
+
+
+    #read gebref_keys-data and assign types
     @staticmethod
     def read_keys(gebref_keys_path):
+        print("Read an filter gebraf_keys-data..")
         gebref_keys = pd.read_csv(gebref_keys_path,
                                   header=None,
                                   names=['type', 'lan', 'rbz',
@@ -44,14 +76,17 @@ class BuildingReferences:
                                          'krs': str, 'gmd': str, 'nam': str},
                                   encoding='utf-8')
 
-        # gebref_keys = gebref_keys.loc[lambda df: df.type == 'G', :]
+        #filter types = G
+        #gebref_keys = gebref_keys.loc[lambda df: df.type == 'G', :]
         gebref_keys = gebref_keys >> mask(X.type == 'G')
 
         return gebref_keys
 
+    #filter gebref_keys from Essen
     def get_city_key(self):
         return self.gebref_keys >> mask(X.nam == self.__studyarea)
 
+    #Getter
     @property
     def gebref(self):
         return self.__gebref
@@ -69,8 +104,16 @@ class BuildingReferences:
         return self.studyarea
 
 
-geb_ref = "..Data/gebref.txt"
-geb_ref_keys = "..Data/gebref_schluessel.txt"
+#datapath
+geb_ref = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/gebref.txt"
+geb_ref_keys = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/gebref_schluessel.txt"
 
+#start class BuildingReferences
 br = BuildingReferences(geb_ref, geb_ref_keys, 'Essen')
 print(br.gebref)
+
+#Methode zum Herunterladen und Bearbeiten der Datei und abspeichern
+
+
+#Matching Adresse von der Webseite Koordinaten aus der Tabelle zuweisen
+('Bochumstraße 47a, 44795 Bochum')
