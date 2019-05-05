@@ -9,13 +9,14 @@ from collections import Counter
 
 class TextMiner:
 
-    def __init__(self, data, filter, counter):
+    def __init__(self, data, filter, counter, most_common_length):
         self.data = data
         self.filter = self.set_filter(filter)
         self.counter = counter
+        self.most_common_length = most_common_length
 
     def set_filter(self, file):
-        # fiter_set fuellen
+        # create filter_set
         filter_set = set()
 
         for line in file:
@@ -28,8 +29,7 @@ class TextMiner:
     @staticmethod
     def strip_punctuation(s):
         """
-        entfernt Satzzeichen
-        auch Punkte z.B. nach Zahlen
+        delete punctuation
         :param s:
         :return:
         """
@@ -38,10 +38,9 @@ class TextMiner:
     @staticmethod
     def create_ngrams(input, min_len, max_len):
         """
-        Bildet N-gramme
-        input ist eine Liste aus Sätzen
-        min_len ist die minimale Länge der N-gramme
-        max_len ist die maximale Länge der N-gramme
+        create N-grams
+        min_len is the minimum length of the N-grams
+        max_len is the maximum length of the N-grams
         :param input:
         :param min_len:
         :param max_len:
@@ -56,7 +55,6 @@ class TextMiner:
     @staticmethod
     def remove_stopwords(text, stopwords):
         """
-
         :param text:
         :param stopwords:
         :return:
@@ -69,29 +67,32 @@ class TextMiner:
 
     def prepare_description(self, text):
         """
-
         :param text:
         :return:
         """
-        #Aufteilung in Sätze
+        # divide in sentences
         sentences = nltk.sent_tokenize(text, language='german')
 
-        #Satzzeichen löschen
+        # delete punctuation
         for i in range(len(sentences)):
          sentences[i] = self.strip_punctuation(sentences[i])
 
-        #Tokenization
+        # to lowercase
+        for i in range(len(sentences)):
+          sentences[i] = sentences[i].lower()
+
+        # tokenizing
         tokenized_text = [nltk.word_tokenize(sent, language='german') for sent in sentences]
 
-        #N-gramme bilden
+        # create N-grams
         ngrams = self.create_ngrams(input=sentences,
                                     min_len=2,
                                     max_len=3)
 
-        #Stoppwörter löschen
+        # delete stopwords
         stop_words = set(stopwords.words('german'))
         self.remove_stopwords(tokenized_text, stop_words)
-        return zip(tokenized_text, ngrams)
+        return tokenized_text, ngrams
 
     @staticmethod
     def filter_nouns(text):
@@ -106,7 +107,7 @@ class TextMiner:
             tags += tagger.tag_text(sent, tagonly=True)
         tags = treetaggerwrapper.make_tags(tags)
 
-        #Nomen filtern
+        # filter nouns
         nouns = set()
         for array in tags:
           if(array[1] == "NNP" or array[1] == "NN" or
@@ -117,8 +118,6 @@ class TextMiner:
     @staticmethod
     def ngrams_to_set(ngrams):
         """
-        die einzelnen str elemente aus den tupeln extrahieren (für jeden Satz)
-        dann daraus ein set erstellen
         :param ngrams:
         :return:
         """
@@ -127,7 +126,7 @@ class TextMiner:
             for tuple in sentence:
                 s = ""
                 for i in range(len(tuple)):
-                    if(i == len(tuple)-1):
+                    if i == len(tuple)-1:
                         s += tuple[i]
                     else:
                         s += tuple[i] + " "
@@ -136,41 +135,35 @@ class TextMiner:
 
     def execute(self):
         """
-
         :return:
         """
 
         for text in self.data:
-            local_counter = Counter()
 
-            tokenized_text, ngrams = zip(*self.prepare_description(text))
+            tokenized_text, ngrams = self.prepare_description(text)
             nouns = self.filter_nouns(tokenized_text)
 
-            # Schnittmenge aus 'nomen' und 'filter_set' bilden
+            # intersect 'nouns' and 'filter'
             result_nouns = nouns.intersection(self.filter)
 
             for word in result_nouns:
-                local_counter[word] += 1
+                self.counter[word] += 1
 
-            # N-gramme zu set konvertiern um das verschneiden vorzubereiten
+            # convert N-grams to set
             ngrams_set = self.ngrams_to_set(ngrams)
 
-            # In filter_set nach ngrammen suchen und nur die gefundenen behalten
+            # intersect 'ngrams_set' and 'filter'
             result_ngrams = ngrams_set.intersection(self.filter)
 
-            # N-gramme zu local_counter hinzufügen
+            # add N-grams to counter
             for ngram in result_ngrams:
-                local_counter[ngram] += 1
+                self.counter[ngram] += 1
 
-            # Diese zur übergreifenden Countliste hinzufügen
-            self.counter += local_counter
-
-        # Liste der x häufigsten Wörter/Nomen ausgeben
-        return self.counter.most_common(10)
+        # create list of x most common words
+        return self.counter.most_common(self.most_common_length)
 
 
 # main script
-print("Text Mining gestartet")
 counter = Counter()
 
 # import csv
@@ -178,19 +171,13 @@ data = pd.read_csv("2019-04-09_123329_MietwohnungenEssen.csv", sep=";", header=0
 descArray = data['beschreibung']
 
 filter_file = open("Filter.txt", "r")
+# length of the list of most common words
+most_common_length = 10
 
 tm = TextMiner(data=descArray,
                filter=filter_file,
-               counter=counter)
+               counter=counter,
+               most_common_length=most_common_length)
 
 result = tm.execute()
-
 print(result)
-
-# f = open("result.txt", "a")
-# for word in result:
-#     f.write(word[0] + ": " + str(word[1]) + "\n")
-# f.write("----------------------------")
-# f.close()
-
-print("Text Mining beendet")
