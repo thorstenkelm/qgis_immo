@@ -1,15 +1,250 @@
-Alarmanlage, Altbau, Alternative Energien, Anlieger, Arbeitszimmer, Architekt, Asbest, Aufzug, Balkon, Bankbürgschaft, Barrierefreiheit,
-Baugerüst, Bauherr, Bauträger, Besichtigung, Blockheizkraftwerk, Brandhemmende Baustoffe, Brauchwasser, Briefkasten, Carport, Courtage,
-Dachsanierung, Dachgeschoss, Dachschräge, Dachterrasse, Dämmung, Darlehen, Denkmalschutz, Doppelhaus-Hälfte, Doppelverglasung, Eigenbedarf,
-Eigentümergemeinschaft, Eigentumswohnung, Einfamilienhaus, Einheitliche, Fassadengestaltung, Einstiegsfreies Bad, Emissions-bzw.Abgasnormen,
-Energetische Sanierung, Energieausweis, Energiesparmaßnahmen, Erbpacht, Erschließungskosten, Exposé, Fachwerkhaus, Fahrradkeller, Fenster,
-Fernwärms, Fertighaus, Feuerversicherung, Fußbodenheizung, Garage, Gartenbeleuchtung, Gartennutzung, Gartenplanung, Gaube, Gebäudeversicherung,
-Geothermie, Gewerbe im Privathaus, Gewerblich genutzte Immobilien, Gewerk, Grundbuchauszug, Grunderwerbsteuer, Grundfläche, Grundschuld,
-Grundschuldlöschung, Grundsteuer, Grundstück, Grundstücksgrenze, Hausnummer, Haustiere, Hausverwaltung, Heizen mit Holz, Hobbykeller,
-Hypothek, Hypothekenbank, Immobilie, Immobilie vererben, Immobilienbewertung, Immobilienvermarktung, Innenausbau, Intelligente Gebäudetechnik,
-Kamin, Kaminholzlagerung, Kaution, Keller, Kernsanierung, Kinderlärm, Kündigungsfristen, Kunst am Bau, Leuchtreklame, Loggia, Lüften, Makler,
-Maler-und Lackiererarbeiten, Massivhaus, Mehrfamilienhaus, Mieterhöhung, Mietminderung, Mietvertrag, Mülltonnen, Musterhaus, Nachmieter,
-Nebenkosten, Nebenkostenabrechnung, Neubau, Niedrigenergiehaus, Obergeschoss, Passivhaus, Provision, Renovierung, Rohbau, Rollstuhlgerechtes Wohnen,
-Schaltplan, Schimmel, Schlüsselfertige Übergabe, Schönheitsreparaturen, Schornsteinfeger, Seniorenwohnung, Statik, Staatliche Förderung,
-Starkstromanschluss, Steckdosen, Teilungserklärung, Terrasse, Tiefgarage, Tilgung, Treppenhaus, Trockenbau, Umzug, Wäschekeller, Wegerecht,
-Wintergarten, Winterräumpflicht, Wohnfläche, Wohnungsbaugesellschaften, Zwangsversteigerung
+abbruchkosten
+abschreibung
+abstandszahlung
+alarmanlage
+altbau
+alternative energien
+anlieger
+apartment
+arbeitszimmer
+asbest
+auÃŸenprovision
+auflassung
+aufzug
+balkon
+bankbÃ¼rgschaft
+barrierefreiheit
+baugerÃ¼st
+baugrenze
+baugrunduntersuchung
+bauland
+baulast
+baulastenverzeichnis
+bauschÃ¤den
+bauvorlage
+beleihung
+beleihungsgrenze
+beleihungswert
+beschrÃ¤nkt persÃ¶nliche dienstbarkeit
+betriebskosten
+beurkundung
+bewertungsgesetz
+bewirtschaftungskosten
+bezugsfertigkeit
+blockheizkraftwerk
+bodengutachten
+bodenrichtwert
+bonitÃ¤t
+brandhemmende baustoffe
+brauchwasser
+briefkasten
+carport
+city apartment
+concierge
+courtage
+dÃ¤mmung
+dachgeschoss
+dachgeschosswohnung
+dachsanierung
+dachschrÃ¤ge
+dachterrasse
+datenschutz
+denkmalschutz
+doppelhaus hÃ¤lfte
+doppelhaus-hÃ¤lfte
+doppelverglasung
+eigenbedarf
+eigenkapital
+eigentÃ¼mergemeinschaft
+eigentumsvormerkung
+eigentumswohnung
+einfache lage
+einfamilienhaus
+einstiegsfreies bad
+energetische sanierung
+energieausweis
+energiepass
+energiesparmaÃŸnahmen
+erbpacht
+erker
+erschlieÃŸungskosten
+ertragswertverfahren
+erwerbskosten
+fachwerkhaus
+fahrradkeller
+fair value
+fassadengestaltung
+fenster
+fernwÃ¤rms
+fertighaus
+feuerversicherung
+finanzierungsplan
+flurbereinigung
+flurkarte
+flurstÃ¼ck
+franzÃ¶sischer balkon
+fremdgeldkonto
+fremdkapital
+fuÃŸbodenheizung
+galerie
+garage
+gartenbeleuchtung
+gartennutzung
+gartenplanung
+gaube
+gebÃ¤udeversicherung
+gebÃ¤udewertermittlung
+gemeiner wert
+gemeinschaftseigentum
+gemeinschaftsordnung
+gemengelage
+geothermie
+gewerbe im privathaus
+gewerblich genutzte immobilien
+gewerk
+gleitender neuwertfaktor
+grÃ¼nland
+grundbesitzssteuer
+grundbuchauszug
+grunddienstbarkeit
+grunderwerbsteuer
+grundflÃ¤che
+grundschuld
+grundschuldlÃ¶schung
+grundstÃ¼cksflÃ¤che
+grundstÃ¼cksgrenze
+grundstÃ¼cksmarktbericht
+grundstÃ¼ckswertermittlung
+grundsteuer
+gute lage
+hausbewertung
+hausgeld
+hausgeldabrechnung
+hausgutachten
+hausnummer
+hausordnung
+haustiere
+hausverwaltung
+heizen mit holz
+hobbykeller
+hypothek
+immobilienbÃ¶rse
+immobiliengutachten
+immobilienwertermittlungsverordnung
+innenausbau
+innenprovision
+instandhaltungskosten
+instandhaltungsrÃ¼cklage
+intelligente gebÃ¤udetechnik
+jahresabrechnung
+kÃ¼ndigungsfristen
+kamin
+kaminholzlagerung
+kapitalanlage
+kaufvertrag
+kaution
+keller
+kernsanierung
+kinderlÃ¤rm
+kubatur
+kunst am bau
+lageplan
+lebensdauer
+leuchtreklame
+liegenschaftskataster
+liegenschaftszinssatz
+loft
+loggia
+luxusimmobilien
+mÃ¶blierte wohnung
+mÃ¼lltonnen
+maisonette-wohnung
+makler
+makler- und bautrÃ¤gerverordnung
+maler-und lackiererarbeiten
+massivhaus
+mehrfamilienhaus
+merkantiler minderwert
+mietdatenbank
+mieterhÃ¶hung
+mietkaution
+mietminderung
+mietpreis
+mietspiegel
+mietvertrag
+mittlere lage
+nachbarschaft
+nachmieter
+nebenkosten
+nebenkostenabrechnung
+nettogrundflÃ¤che
+neubau
+niedrigenergiehaus
+notar
+obergeschoss
+obhutspflicht des mieters
+ortsÃ¼bliche miete
+parterre
+passivhaus
+patio
+penthouse
+pflichten des wohneigentÃ¼mers
+pied-a-terreprovision
+provision
+qualifizierter mehrheitsbeschluss
+rauchmelder
+reallast
+rendite
+renovierung
+rohbau
+rollstuhlgerechtes wohnen
+sachwertverfahren
+schÃ¶nheitsreparaturen
+schaltplan
+schimmel
+schlÃ¼sselfertige Ã¼bergabe
+schornsteinfeger
+schufa
+seniorenwohnung
+serviced apartment
+serviced-living-concept
+sondereigentum
+sondereigentumsverwaltung
+sondernutzungsrecht
+sonderumlage
+souterrain
+staatliche fÃ¶rderung
+starkstromanschluss
+statik
+steckdosen
+studio
+teileigentum
+teilungserklÃ¤rung
+terrasse
+tiefgarage
+treppenhaus
+trockenbau
+umlage von betriebskosten
+umzug
+unbedenklichkeitsbescheinigung
+verÃ¤nderungssperre
+vergleichsmiete
+vergleichswertverfahren
+verkausfolge-management
+verkehrswert
+versicherungsnachweis
+verwaltervertrag
+wÃ¤schekeller
+wegerecht
+wertsteigerung
+wintergarten
+winterrÃ¤umpflicht
+wohnflÃ¤che
+wohngeld
+wohnungsbaugesellschaften
+wohnungseigentumsgesetz
+zahlungsplan
+zentrale lage
+zentrumsnah
+zinsabschlag
+zwangsversteigerung
