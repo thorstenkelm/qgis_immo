@@ -4,67 +4,84 @@
 import urllib.request
 import zipfile
 from dfply import *
+from pathlib import Path
 
 
 
 class BuildingReferences:
 
-    #Konstruktor, der die Funktionen read_data, read_keys und get_city_key aufruft
-    def __init__(self, gebref_path, gebref_keys_path, studyarea):
-     #   self.download_data()
+    GEBREF_URL = 'https://www.opengeodata.nrw.de/produkte/geobasis/lika/alkis_sek/gebref/gebref_EPSG4647_ASCII.zip'
+
+    def __init__(self, gebref_path, gebref_keys_path, studyarea, savepath):
+        self.savepath = savepath
+        self.download_data()
         self.__studyarea = studyarea
         self.__gebref_keys = self.read_keys(gebref_keys_path)
         self.__city_key = self.get_city_key()
         self.__gebref = self.read_data(gebref_path)
 
 
-    #def download_data (self):
-    #    print("Beginning file download...")
-    #    url = 'https://www.opengeodata.nrw.de/produkte/geobasis/lika/alkis_sek/gebref/gebref_EPSG4647_ASCII.zip'
-    #    save = 'C:/Users/Fabian Hannich/Desktop/gebref.zip'
-    #    urllib.request.urlretrieve(url, save)
-    #    print("..download ends!")
+    def download_data (self):
+        gebref_file = Path(self.savepath+'/gebref.txt')
+        if gebref_file.is_file():
+            print("The gebref-file already exists!")
 
-    #    print("Unpack data...")
-    #    extractTo = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/"
-    #    zipfile.ZipFile(save, 'r').extractall(extractTo)
-    #    print("Data ready!")
+        else:
+            print("Beginning file download...")
+            urllib.request.urlretrieve(self.GEBREF_URL, self.savepath+'gebref.zip')
+            print("..download ends!")
+            print("Unpack data...")
+            zipfile.ZipFile(self.savepath+'/gebref.zip', 'r').extractall(self.savepath)
+            print("Data ready!")
 
 
     #read gebref-data and assign type
     def read_data(self, gebref_path):
-        print("Read, filter and encoding gebref_data..")
-        gebref_data = pd.read_csv(gebref_path,
-                                  sep=';',
-                                  decimal=',',
-                                  header=None,
-                                  names=['nba', 'oi', 'qua', 'lan', 'rbz', 'krs', 'gmd',
-                                         'ott', 'sss', 'hsr', 'adz', 'east', 'north', 'stn'],
-                                  usecols=['lan', 'rbz', 'krs', 'gmd', 'hsr',
-                                           'adz', 'east', 'north', 'stn'],
-                                  dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
-                                         'adz': str, 'east': float, 'north': float, 'stn': str},
-                                  encoding='ISO-8859-1')
 
-        #fill empty lines
-        gebref_data.fillna('', inplace=True)
+        gebref_edit = Path(self.savepath+'/gebref_edit.txt')
+        if gebref_edit.is_file():
+            print("The gebref_edit-file already exists!")
 
-        #filter the gebref_data
-        gebref_data = gebref_data >> mask(X.lan == self.__city_key['lan'].values[0],
-                                                      X.rbz == self.__city_key['rbz'].values[0],
-                                                      X.krs == self.__city_key['krs'].values[0],
-                                                      X.gmd == self.__city_key['gmd'].values[0])
+            gebref_bearbeitet = pd.read_csv(gebref_edit,
+                                            sep=';',
+                                            decimal=',',
+                                            header=None,
+                                            names=['lan', 'rbz', 'krs', 'gmd', 'hsr',
+                                                   'adz', 'east', 'north', 'stn'],
+                                            dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
+                                                   'adz': str, 'east': float, 'north': float, 'stn': str},
+                                            encoding='ISO-8859-1')
 
-        #delete unused columns
-        gebref_bearbeitet = gebref_data.drop(["lan", "rbz", "krs", "gmd"], axis = 1)
 
-        #text encoding
-        gebref_bearbeitet = gebref_bearbeitet.replace("str.", "str", regex=True).replace("Str.", "str", regex=True)\
-            .replace("Ã¼", "ue", regex=True).replace("Ã¤", "ae", regex=True).replace("Ã¶", "oe", regex=True).replace("Ã", "ss", regex=True).replace(" ", "", regex=True)
+        else:
+            print("Read, filter and encoding gebref_data..")
+            gebref_data = pd.read_csv(gebref_path,
+                                    sep=';',
+                                    decimal=',',
+                                    header=None,
+                                    names=['nba', 'oi', 'qua', 'lan', 'rbz', 'krs', 'gmd',
+                                            'ott', 'sss', 'hsr', 'adz', 'east', 'north', 'stn'],
+                                    usecols=['lan', 'rbz', 'krs', 'gmd', 'hsr',
+                                            'adz', 'east', 'north', 'stn'],
+                                    dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
+                                            'adz': str, 'east': float, 'north': float, 'stn': str},
+                                    encoding='ISO-8859-1')
 
-        #save as a data that called gebref
-        header = ["stn","hsr","adz","east","north"]
-        gebref_bearbeitet.to_csv("C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/gebrefBBBB.txt", columns=header, index=False)
+            #fill empty lines
+            gebref_data.fillna('', inplace=True)
+
+            #filter the gebref_data
+            gebref_data = gebref_data >> mask(X.lan == self.__city_key['lan'].values[0],
+                                                        X.rbz == self.__city_key['rbz'].values[0],
+                                                        X.krs == self.__city_key['krs'].values[0],
+                                                        X.gmd == self.__city_key['gmd'].values[0])
+
+            #text encoding
+            gebref_bearbeitet = gebref_data.replace("str.", "str", regex=True).replace("Str.", "str", regex=True)\
+                .replace("Ã¼", "ue", regex=True).replace("Ã¤", "ae", regex=True).replace("Ã¶", "oe", regex=True).replace("Ã", "ss", regex=True).replace(" ", "", regex=True)
+
+            #save as a data that called gebref
+            gebref_bearbeitet.to_csv(self.savepath+'/gebref_edit.txt', index=False)
 
         return gebref_bearbeitet
 
@@ -92,26 +109,6 @@ class BuildingReferences:
     def get_city_key(self):
         return self.gebref_keys >> mask(X.nam == self.__studyarea)
 
-    #get Coordinates from an adress
-    def getCoordinates(self, adresse, gebref):
-        a = adresse.split()
-        counter = len(a)
-
-        if counter == 2:
-            gebref = gebref >> mask (X.stn == a[0],
-                                     X.hsr == a[1])
-
-        else:
-            gebref = gebref >> mask(X.stn == a[0],
-                                    X.hsr == a[1],
-                                    X.adz == a[2])
-
-        coordinates = gebref.to_string(index=False, header = False, columns=["east","north"] ,index_names=False, decimal=',')
-
-        return coordinates
-
-
-
     #Getter
     @property
     def gebref(self):
@@ -135,5 +132,7 @@ geb_ref = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo
 geb_ref_keys = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/gebref_schluessel.txt"
 
 #start class BuildingReferences
-br = BuildingReferences(geb_ref, geb_ref_keys, 'Essen')
-print(br.getCoordinates('Dilldorferstr 52 a', br.gebref))
+br = BuildingReferences(gebref_path=geb_ref,
+                        gebref_keys_path=geb_ref_keys,
+                        studyarea='Essen',
+                        savepath='C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/')
