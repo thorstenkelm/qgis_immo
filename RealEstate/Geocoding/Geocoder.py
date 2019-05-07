@@ -5,12 +5,38 @@ Author: Lena Karweg, lena.karweg@hs-bochum.de
 
 import geocoder
 from pyproj import Proj, transform
-
+from dfply import *
 
 class Geocoder:
     # define transformation parameter
     WGS84 = Proj(init='epsg:4326')
     ETRS89 = Proj(init='epsg:4647')
+
+    def __init__(self, gebref):
+        self.__gebref = gebref
+
+
+    #get Coordinates from an adress
+    def getCoordinates(self, adresse):
+        a = adresse.split()
+        counter = len(a)
+
+        if counter == 2:
+            gebref = self.gebref >> mask(X.stn == a[0],
+                                     X.hsr == a[1])
+
+        else:
+            gebref = self.gebref >> mask(X.stn == a[0],
+                                    X.hsr == a[1],
+                                    X.adz == a[2])
+
+        coordinates = gebref.to_string(index=False, header = False, columns=["east","north"] ,index_names=False, decimal=',')
+
+        return coordinates
+
+    # Funktion getCoordinate in Geocoder kopieren
+    # accaracy auf 1 setzen bei den Hauskoordinaten
+    # keine Adresse gefunden = NONE
 
     def geocode(self, address):
 
