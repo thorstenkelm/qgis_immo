@@ -133,6 +133,16 @@ class TextMiner:
                 result.add(s)
         return result
 
+    @staticmethod
+    def get_result(self):
+        """
+        :return: result
+        returns a dict of x most common words
+        """
+        result = self.counter.most_common(self.most_common_length)
+        return dict(result)
+
+    @property
     def execute(self):
         """
         :return:
@@ -159,8 +169,7 @@ class TextMiner:
             for ngram in result_ngrams:
                 self.counter[ngram] += 1
 
-        # create list of x most common words
-        return self.counter.most_common(self.most_common_length)
+        return self.get_result(self)
 
 
 # main script
@@ -179,5 +188,6 @@ tm = TextMiner(data=descArray,
                counter=counter,
                most_common_length=most_common_length)
 
-result = tm.execute()
+result = tm.execute
+print(type(result))
 print(result)
