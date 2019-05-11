@@ -3,6 +3,8 @@ Description: # TODO class description is missing
 Author: Marlena Hecker, marlena.hecker@hs-bochum.de
 """
 
+import pandas as pd
+
 
 class ImmoDataModel:
 
@@ -20,62 +22,48 @@ class ImmoDataModel:
         expose_id = self.get_element('@id')
         street = self.get_element('resultlist.realEstate_address_street')
         street_hsno = self.get_element('resultlist.realEstate_address_houseNumber')
+        zipcode = self.get_element('resultlist.realEstate_address_postcode')
+        city = self.get_element('resultlist.realEstate_city')
+        title = self.get_element('resultlist.realEstate_title')
+        private_offer = self.get_element('resultlist.realEstate_title').capitilize()
+        rent_brutto_eur = self.get_element('resultlist.realEstate_price_value')
+        # rent_brutto_marketing_type = self.get_element('resultlist.realEstate_marketingType')
+        # rent_brutto_interval_type = self.get_element('resultlist.realEstate_price_priceIntervalType')
+        rent_netto_eur = self.get_element('resultlist.realEstate_calculatedPrice_value')
+        # rent_netto_marketing_type = self.get_element('resultlist.realEastate_calculatedPrice_marketingType')
+        # rent_netto_interval_type = self.get_element('resultlist.realEastate_calculatedPrice_priceIntervalType')
+        rent_scope = self.get_element('resultlist.realEastate_calculatedPrice_rentScope')
+        living_space_sqm = self.get_element('resultlist.realEstate_livingSpace')
+        sqm_price = rent_brutto_eur / living_space_sqm
+        num_rooms = self.get_element('resultlist.realEstate_numberOfRooms')
+        fitted_kitchen = self.get_element('resultlist.realEstate_builtInKitchen').capitalize()
+        balcony = self.get_element('resultlist.realEstate_balcony').capitalize()
+        garden = self.get_element('resultlist.realEstate_garden').capitalize()
 
-        # e_id = data['@id']
-        # street = data['address']['street'] if "street" in data['address'] else None
-        # street_hsno = data['address']['houseNumber'] if "houseNumber" in data['address'] else None
-        # zipcode = data['address']['postcode']
-        # city = data['address']['city']
-        # title = data['title']
-        # private_offer = data['privateOffer'].capitalize()
-        # rent_brutto = data['price']['value']
-        # rent_netto = data['calculatedPrice']['value']
-        # living_space = data['livingSpace']
-        # qm_price = rent_brutto/living_space
-        # num_rooms = data['numberOfRooms']
-        # fitted_kitchen = data['builtInKitchen'].capitalize()
-        # balcony = data['balcony'].capitalize()
-        # garden = data['garden'].capitalize()
-        #
-        # address = city + " " + street + " " + street_hsno
-        # print(address)
+        data_dict = {
+            "expose_id": expose_id,
+            "street": street,
+            "street_hsno": street_hsno,
+            "zipcode": zipcode,
+            "city": city,
+            "title": title,
+            "private_offer": private_offer,
+            "rent_brutto_eur": rent_brutto_eur,
+            # "rent_brutto_marketing_type" : rent_brutto_marketing_type,
+            # "rent_brutto_interval_type" : # rent_brutto_interval_type,
+            "rent_netto_eur": rent_netto_eur,
+            # "rent_netto_marketing_type" : rent_netto_marketing_type,
+            # "rent_netto_interval_type" : rent_netto_interval_type,
+            "rent_scope": rent_scope,
+            "living_space": living_space_sqm,
+            "sqm_price": sqm_price,
+            "num_rooms": num_rooms,
+            "fitted_kitchen": fitted_kitchen,
+            "balcony": balcony,
+            "garden": garden,
+        }
 
-        #
-        #
-        #
-        # df = pd.DataFrame(
-        #     {
-        #         "expose_id": [e_id],
-        #         # "address": [data['address']['street'] if "street" in data['address'] else "" + " " + data['address'][
-        #         #     'houseNumber'] if "houseNumber" in data['address'] else "" + ", " +
-        #         #                                                             data['address']['postcode'] + " " +
-        #         #                                                             data['address']['city']],
-        #         "street": [street],
-        #         "street_hsno": [street_hsno],
-        #         "zipcode": [zipcode],
-        #         "city": [city],
-        #         "title": [title],
-        #         "private_offer": [private_offer],
-        #         "rent_brutto_eur": [rent_brutto],
-        #         "rent_netto_eur": [rent_netto],
-        #         "living_space": [living_space],
-        #         "qm_price": [qm_price],
-        #         "num_rooms": [num_rooms],
-        #         "fitted_kitchen": [fitted_kitchen],
-        #         "balcony": [balcony],
-        #         "garden": [garden],
-        #
-        #         #"verified_address": None,
-        #         "verified_lat": [verified_lat],
-        #         "verified_long": [verified_long],
-        #         "verified_x": [verified_x],
-        #         "verified_y": [verified_y],
-        #         "accuracy": [accuracy],
-        #
-        #     }
-        # )
-        #
-        # return
+        return pd.DataFrame(data_dict)
 
     def get_element(self, key):
         """
@@ -84,7 +72,10 @@ class ImmoDataModel:
         :return: value
         """
         try:
-            return self.init_data.get(key).values[0]
+            if self.init_data.get(key) == dict:
+                return self.init_data.get(key)
+            elif self.init_data.get(key) == pandas.core.frame.DataFrame or self.init_data.get(key) == pandas.core.series.Series:
+                return self.init_data.get(key).values[0]
         except KeyError as e:
             print(e)
             # no element in data
@@ -100,58 +91,58 @@ class ImmoDataModel:
         :return:
         """
         try:
-            # set type
-            # self.data.astype(dtype={"expose_id": "int64",
-            #                                 # "address": "str",
-            #                                 "street": "str",
-            #                                 "street_hsno": "str",
-            #                                 "zipcode": "str",  # Because it always has to have 5 digits
-            #                                 "city": "str",
-            #                                 "title": "str",
-            #                                 "private_offer": "bool",
-            #                                 "rent_brutto": "float",
-            #                                 "rent_netto": "float",
-            #                                 "living_space": "float",
-            #                                 "num_rooms": "float",
-            #                                 "fitted_kitchen": "bool",
-            #                                 "balcony": "bool",
-            #                                 "garden": "bool",
-            #
-            #                                 # "verified_address": "str",
-            #                                 "verified_lat": "float64",
-            #                                 "verified_long": "float64",
-            #                                 "accuracy": "float",
-            #
-            #                                 })
-            pass
+            self.data.astype(dtype={"expose_id": "int64",
+                                    "street": "str",
+                                    "street_hsno": "str",
+                                    "zipcode": "str",  # Because it always has to have 5 digits
+                                    "city": "str",
+                                    "title": "str",
+                                    "private_offer": "bool",
+                                    "rent_brutto_eur": "float",
+                                    #"rent_brutto_marketing_type": "str",
+                                    #"rent_brutto_interval_type": "str",
+                                    "rent_netto_eur": "float",
+                                    #"rent_netto_marketing_type": "str",
+                                    #"rent_netto_interval_type": "str",
+                                    "rent_scope": "str",
+                                    "living_space": "float",
+                                    "sqm_price": "float",
+                                    "num_rooms": "float",
+                                    "fitted_kitchen": "bool",
+                                    "balcony": "bool",
+                                    "garden": "bool"
+                                    })
         except ValueError as e:
             print(e)
 
-    @property
-    def get_data(self):
-        return self.data
 
-    def get_address(self):
-        """
-        Get address from geocoder
-        :return:
-        """
-        pass
+@property
+def get_data(self):
+    return self.data
 
-    def set_coordinates(self, coordinates):
-        """
-        Set coordinates from geocoder
-        :param coordinates: dict (accuracy, lat, lon, x, y)
-        """
 
-        # coordinates = self.geocoder.geocode(address)
-        #
-        #
-        #
-        # verified_lat = None
-        # verified_long = None
-        # verified_x = coordinates ["x"]
-        # verified_y = None
-        # accuracy: None
+def get_address(self):
+    """
+    Get address from geocoder
+    :return:
+    """
+    pass
 
-        pass
+
+def set_coordinates(self, coordinates):
+    """
+    Set coordinates from geocoder
+    :param coordinates: dict (accuracy, lat, lon, x, y)
+    """
+
+    # coordinates = self.geocoder.geocode(address)
+    #
+    #
+    #
+    # verified_lat = None
+    # verified_long = None
+    # verified_x = coordinates ["x"]
+    # verified_y = None
+    # accuracy: None
+
+    pass
