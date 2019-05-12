@@ -7,36 +7,47 @@ import geocoder
 from pyproj import Proj, transform
 from dfply import *
 
-class Geocoder:
+class Geocoder ():
+
     # define transformation parameter
     WGS84 = Proj(init='epsg:4326')
     ETRS89 = Proj(init='epsg:4647')
 
-    def __init__(self, gebref):
+    def __init__(self, gebref, adresse):
         self.__gebref = gebref
+        self.__adresse = adresse
 
 
-    #get Coordinates from an adress
+    # get Coordinates from an adress
     def getCoordinates(self, adresse):
         a = adresse.split()
         counter = len(a)
 
-        if counter == 2:
-            gebref = self.gebref >> mask(X.stn == a[0],
-                                     X.hsr == a[1])
+        try:
+            if counter == 2:
+                gebref = self.gebref >> mask(X.stn == a[0],
+                                         X.hsr == a[1])
 
-        else:
-            gebref = self.gebref >> mask(X.stn == a[0],
-                                    X.hsr == a[1],
-                                    X.adz == a[2])
+            if counter == 3:
+                gebref = self.gebref >> mask(X.stn == a[0],
+                                         X.hsr == a[1],
+                                         X.adz == a[2])
 
-        coordinates = gebref.to_string(index=False, header = False, columns=["east","north"] ,index_names=False, decimal=',')
 
-        return coordinates
+            coordinates = gebref.to_dict(orient='list')
+            x = coordinates['east']
+            y = coordinates['north']
+            accuracy = 1
 
-    # Funktion getCoordinate in Geocoder kopieren
-    # accaracy auf 1 setzen bei den Hauskoordinaten
-    # keine Adresse gefunden = NONE
+            return {"accuracy": accuracy,
+                    "x": x,
+                    "y": y}
+
+        except:
+            print("Geocode-function is used to get the coordinates..")
+            return self.geocode(adresse)
+
+
 
     def geocode(self, address):
 
@@ -67,7 +78,6 @@ class Geocoder:
 
 
 if __name__ == '__main__':
-    g = Geocoder()
-    print(g.geocode("Essen Witteringstr 9 "))
+    g = Geocoder(gebref=, adresse="Witteringstr 9")
 
 

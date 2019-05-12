@@ -7,18 +7,17 @@ from dfply import *
 from pathlib import Path
 
 
-
 class BuildingReferences:
 
     GEBREF_URL = 'https://www.opengeodata.nrw.de/produkte/geobasis/lika/alkis_sek/gebref/gebref_EPSG4647_ASCII.zip'
 
-    def __init__(self, gebref_path, gebref_keys_path, studyarea, savepath):
+    def __init__(self, studyarea, savepath):
         self.savepath = savepath
         self.download_data()
         self.__studyarea = studyarea
-        self.__gebref_keys = self.read_keys(gebref_keys_path)
+        self.__gebref_keys = self.read_keys(savepath+'/gebref_schluessel.txt')
         self.__city_key = self.get_city_key()
-        self.__gebref = self.read_data(gebref_path)
+        self.__gebref = self.read_data(savepath+'gebref.txt')
 
 
     def download_data (self):
@@ -29,10 +28,8 @@ class BuildingReferences:
         else:
             print("Beginning file download...")
             urllib.request.urlretrieve(self.GEBREF_URL, self.savepath+'gebref.zip')
-            print("..download ends!")
-            print("Unpack data...")
+            print("Unpack file...")
             zipfile.ZipFile(self.savepath+'/gebref.zip', 'r').extractall(self.savepath)
-            print("Data ready!")
 
 
     #read gebref-data and assign type
@@ -43,15 +40,14 @@ class BuildingReferences:
             print("The gebref_edit-file already exists!")
 
             gebref_bearbeitet = pd.read_csv(gebref_edit,
-                                            sep=';',
-                                            decimal=',',
-                                            header=None,
+                                            sep=',',
+                                            decimal='.',
+                                            header=0,
                                             names=['lan', 'rbz', 'krs', 'gmd', 'hsr',
                                                    'adz', 'east', 'north', 'stn'],
                                             dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
                                                    'adz': str, 'east': float, 'north': float, 'stn': str},
                                             encoding='ISO-8859-1')
-
 
         else:
             print("Read, filter and encoding gebref_data..")
@@ -89,7 +85,7 @@ class BuildingReferences:
     #read gebref_keys-data and assign types
     @staticmethod
     def read_keys(gebref_keys_path):
-        print("Read an filter gebraf_keys-data..")
+        print("Read and filter gebraf_keys-data..")
         gebref_keys = pd.read_csv(gebref_keys_path,
                                   header=None,
                                   names=['type', 'lan', 'rbz',
@@ -105,9 +101,11 @@ class BuildingReferences:
 
         return gebref_keys
 
+
     #filter gebref_keys from Essen
     def get_city_key(self):
         return self.gebref_keys >> mask(X.nam == self.__studyarea)
+
 
     #Getter
     @property
@@ -127,12 +125,6 @@ class BuildingReferences:
         return self.studyarea
 
 
-#datapath
-geb_ref = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/gebref.txt"
-geb_ref_keys = "C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/gebref_schluessel.txt"
-
 #start class BuildingReferences
-br = BuildingReferences(gebref_path=geb_ref,
-                        gebref_keys_path=geb_ref_keys,
-                        studyarea='Essen',
+br = BuildingReferences(studyarea='Essen',
                         savepath='C:/Users/Fabian Hannich/Documents/Studium/6. Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/')
