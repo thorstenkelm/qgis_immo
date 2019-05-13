@@ -10,8 +10,7 @@ from datetime import datetime as DateTime
 import time
 
 
-
-class Geocoder():
+class Geocoder:
     # define transformation parameter
     WGS84 = Proj(init='epsg:4326')
     ETRS89 = Proj(init='epsg:4647')
@@ -20,9 +19,7 @@ class Geocoder():
         self.__gebref = gebref
         self.__time = DateTime.now().strftime('%H:%M:%S')
 
-
-
-    # get Coordinates from an adress
+    # get Coordinates from an address
     def getCoordinates(self, address):
         a = address.split()
         counter = len(a)
@@ -49,15 +46,16 @@ class Geocoder():
                     "x": x,
                     "y": y}
 
-    def geocode(self, address):
+    def __geocode(self, address):
 
-        # TODO "try-block" no address found - https://geocoder.readthedocs.io/api.html#examples Error Handling
-        # TODO try-block ConnectionError - return is missing
         try:
+            # query the time
+            current_time = DateTime.now().strftime('%H:%M:%S')
+            if self.__time_difference(current_time) < 1:
+                time.sleep(1000)
 
-            #query the time
-            if self.__time == DateTime.now().strftime('%H:%M:%S'):
-               time.sleep(1000)
+            # set time
+            self.time(current_time)
 
             # geocode address
             g = geocoder.osm(address)
@@ -71,13 +69,13 @@ class Geocoder():
                 lng = json['lng']
 
                 # convert wgs to etrs
-                x_trans, y_trans = self.wgs2etrs(lng, lat)
+                x_trans, y_trans = self.__wgs2etrs(lng, lat)
 
-                return self.return_data(accuracy=accuracy,
+                return self.__return_data(accuracy=accuracy,
                                         x=x_trans,
                                         y=y_trans)
             else:
-                return self.return_data()
+                return self.__return_data()
 
 
         except ConnectionError as e:
@@ -85,12 +83,12 @@ class Geocoder():
             return self.return_data()
 
     @staticmethod
-    def return_data(accuracy=0, x=0, y=0):
+    def __return_data(accuracy=0, x=0, y=0):
         return {"accuracy": accuracy,
                 "x": x,
                 "y": y}
 
-    def wgs2etrs(self, lng, lat):
+    def __wgs2etrs(self, lng, lat):
         """
 
         :param lng: longitude
@@ -98,6 +96,20 @@ class Geocoder():
         :return: x, y
         """
         return transform(self.WGS84, self.ETRS89, lng, lat)
+
+    # getter time
+    @property
+    def time(self):
+        return self.__time
+
+    # setter time
+    @time.setter
+    def time(self, value):
+        self.__time = value
+
+    #time difference
+    def __time_difference(self, time):
+        return time - self.time
 
 if __name__ == '__main__':
     # g = Geocoder(gebref=, adresse="Witteringstr 9")
