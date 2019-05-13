@@ -6,16 +6,20 @@ Author: Lena Karweg, lena.karweg@hs-bochum.de
 import geocoder
 from pyproj import Proj, transform
 from dfply import *
+from datetime import datetime as DateTime
+import time
 
-class Geocoder ():
 
+
+class Geocoder():
     # define transformation parameter
     WGS84 = Proj(init='epsg:4326')
     ETRS89 = Proj(init='epsg:4647')
 
-    def __init__(self, gebref, adresse):
+    def __init__(self, gebref):
         self.__gebref = gebref
-        self.__adresse = adresse
+        self.__time = DateTime.now().strftime('%H:%M:%S')
+
 
 
     # get Coordinates from an adress
@@ -31,52 +35,70 @@ class Geocoder ():
             gebref = self.gebref >> mask(X.stn == a[0],
                                          X.hsr == a[1],
                                          X.adz == a[2])
-        coordinates = gebref.to_dict(orient='list')
-        x = coordinates['east']
-        y = coordinates['north']
-        accuracy = 1
-
-        return {"accuracy": accuracy,
-                "x": x,
-                "y": y}
-
 
         else:
             print("Geocode-function is used to get the coordinates..")
             return self.geocode(address)
 
+            coordinates = gebref.to_dict(orient='list')
+            x = coordinates['east']
+            y = coordinates['north']
+            accuracy = 1
 
-       #couter in eine eigene Funktion
-
+            return {"accuracy": accuracy,
+                    "x": x,
+                    "y": y}
 
     def geocode(self, address):
 
         # TODO "try-block" no address found - https://geocoder.readthedocs.io/api.html#examples Error Handling
         # TODO try-block ConnectionError - return is missing
+        try:
 
-        # geocode address
-        g = geocoder.osm(address)
-        json = g.geojson['features'][0]['properties']
+            #query the time
+            if self.__time == DateTime.now().strftime('%H:%M:%S'):
+               time.sleep(1000)
 
-        # extract information
-        accuracy = json['accuracy']
-        lat = json['lat']
-        lng = json['lng']
+            # geocode address
+            g = geocoder.osm(address)
+            if g.ok:
 
-        # convert wgs to etrs
-        x_trans, y_trans = self.wgs2etrs(lng, lat)
+                json = g.geojson['features'][0]['properties']
 
+                # extract information
+                accuracy = json['accuracy']
+                lat = json['lat']
+                lng = json['lng']
+
+                # convert wgs to etrs
+                x_trans, y_trans = self.wgs2etrs(lng, lat)
+
+                return self.return_data(accuracy=accuracy,
+                                        x=x_trans,
+                                        y=y_trans)
+            else:
+                return self.return_data()
+
+
+        except ConnectionError as e:
+            print(e)
+            return self.return_data()
+
+    @staticmethod
+    def return_data(accuracy=0, x=0, y=0):
         return {"accuracy": accuracy,
-                "x": x_trans,
-                "y": y_trans}
-
+                "x": x,
+                "y": y}
 
     def wgs2etrs(self, lng, lat):
-        x_trans, y_trans = transform(self.WGS84, self.ETRS89, lng, lat)
-        return x_trans, y_trans
+        """
 
+        :param lng: longitude
+        :param lat: latitude
+        :return: x, y
+        """
+        return transform(self.WGS84, self.ETRS89, lng, lat)
 
 if __name__ == '__main__':
- # g = Geocoder(gebref=")
+    # g = Geocoder(gebref=, adresse="Witteringstr 9")
     pass
-
