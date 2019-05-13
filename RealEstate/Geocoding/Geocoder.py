@@ -6,6 +6,9 @@ Author: Lena Karweg, lena.karweg@hs-bochum.de
 import geocoder
 from pyproj import Proj, transform
 from dfply import *
+from datetime import datetime as DateTime
+import time
+
 
 
 class Geocoder():
@@ -15,7 +18,9 @@ class Geocoder():
 
     def __init__(self, gebref):
         self.__gebref = gebref
-        
+        self.__time = DateTime.now().strftime('%H:%M:%S')
+
+
 
     # get Coordinates from an adress
     def getCoordinates(self, address):
@@ -49,7 +54,11 @@ class Geocoder():
         # TODO "try-block" no address found - https://geocoder.readthedocs.io/api.html#examples Error Handling
         # TODO try-block ConnectionError - return is missing
         try:
-            #Uhrzeitabfrage
+
+            #query the time
+            if self.__time == DateTime.now().strftime('%H:%M:%S'):
+               time.sleep(1000)
+
             # geocode address
             g = geocoder.osm(address)
             if g.ok:
@@ -64,9 +73,9 @@ class Geocoder():
                 # convert wgs to etrs
                 x_trans, y_trans = self.wgs2etrs(lng, lat)
 
-                return self.return_data(accuracy,
-                                        x_trans,
-                                        y_trans)
+                return self.return_data(accuracy=accuracy,
+                                        x=x_trans,
+                                        y=y_trans)
             else:
                 return self.return_data()
 
@@ -84,9 +93,9 @@ class Geocoder():
     def wgs2etrs(self, lng, lat):
         """
 
-        :param lng:
-        :param lat:
-        :return:
+        :param lng: longitude
+        :param lat: latitude
+        :return: x, y
         """
         return transform(self.WGS84, self.ETRS89, lng, lat)
 
