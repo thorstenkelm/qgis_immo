@@ -15,7 +15,7 @@ class Geocoder():
 
     def __init__(self, gebref):
         self.__gebref = gebref
-        self.__
+        
 
     # get Coordinates from an adress
     def getCoordinates(self, address):
