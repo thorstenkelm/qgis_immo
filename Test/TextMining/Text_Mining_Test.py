@@ -91,7 +91,8 @@ class TextMiner:
         #Stoppwörter löschen
         stop_words = set(stopwords.words('german'))
         self.remove_stopwords(tokenized_text, stop_words)
-        return zip(tokenized_text, ngrams)
+
+        return tokenized_text, ngrams
 
     @staticmethod
     def filter_nouns(text):
@@ -104,6 +105,8 @@ class TextMiner:
         tags = []
         for sent in text:
             tags += tagger.tag_text(sent, tagonly=True)
+
+        time0 = time.time()
         tags = treetaggerwrapper.make_tags(tags)
 
         #Nomen filtern
@@ -143,7 +146,7 @@ class TextMiner:
         for text in self.data:
             local_counter = Counter()
 
-            tokenized_text, ngrams = zip(*self.prepare_description(text))
+            tokenized_text, ngrams = self.prepare_description(text)
             nouns = self.filter_nouns(tokenized_text)
 
             # Schnittmenge aus 'nomen' und 'filter_set' bilden
@@ -179,6 +182,7 @@ descArray = data['beschreibung']
 
 filter_file = open("Filter.txt", "r")
 
+time3 = time.time()
 tm = TextMiner(data=descArray,
                filter=filter_file,
                counter=counter)
