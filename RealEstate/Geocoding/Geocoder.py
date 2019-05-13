@@ -19,19 +19,22 @@ class Geocoder ():
 
 
     # get Coordinates from an adress
-    def getCoordinates(self, adresse):
-        a = adresse.split()
+    def getCoordinates(self, address):
+        a = address.split()
         counter = len(a)
 
-        try:
-            if counter == 2:
-                gebref = self.gebref >> mask(X.stn == a[0],
+        if counter == 2:
+            gebref = self.gebref >> mask(X.stn == a[0],
                                          X.hsr == a[1])
 
-            if counter == 3:
-                gebref = self.gebref >> mask(X.stn == a[0],
+        elif counter == 3:
+            gebref = self.gebref >> mask(X.stn == a[0],
                                          X.hsr == a[1],
                                          X.adz == a[2])
+
+        else:
+            print("Geocode-function is used to get the coordinates..")
+            return self.geocode(address)
 
 
             coordinates = gebref.to_dict(orient='list')
@@ -42,10 +45,6 @@ class Geocoder ():
             return {"accuracy": accuracy,
                     "x": x,
                     "y": y}
-
-        except:
-            print("Geocode-function is used to get the coordinates..")
-            return self.geocode(adresse)
 
 
 
@@ -67,8 +66,6 @@ class Geocoder ():
         x_trans, y_trans = self.wgs2etrs(lng, lat)
 
         return {"accuracy": accuracy,
-                "latitude": lat,
-                "longitude": lng,
                 "x": x_trans,
                 "y": y_trans}
 
@@ -78,6 +75,6 @@ class Geocoder ():
 
 
 if __name__ == '__main__':
-    g = Geocoder(gebref=, adresse="Witteringstr 9")
-
+ # g = Geocoder(gebref=, adresse="Witteringstr 9")
+    pass
 
