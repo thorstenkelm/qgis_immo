@@ -1,9 +1,7 @@
 """
-Description: # TODO class description is missing
-Author:
-
-Class to scrape relevant data from an Immoscout24-URL
+Description: Class to scrape relevant data from an Immoscout24-URL
 Class has to be initialised with the url of the first page of chosen city
+Author: Maximilian Haverkamp & Veronika Schmidt
 """
 
 import pandas as pd
@@ -15,6 +13,7 @@ import json
 from flatten_dict import flatten
 
 from RealEstate.Geocoding.Geocoder import Geocoder
+
 from RealEstate.ImmobilienScout24.ImmoDataModel import ImmoDataModel
 
 
@@ -24,118 +23,159 @@ class ImmoScout24Scrapper:
 
     def __init__(self, url):
         self.url = url
-        # TODO parameters like city, number of pages for example save in object
+        print("Die AusgangsUrl lautet: "+self.url)
+        self.city = self.get_city()
+        print("Es werden "+ str(self.get_numberOfPages())+" Seiten durchsucht")
 
     def execute(self):
         """
         Execute method to start the functions for data scraping
-        :return:
+        :return pandas dataframe:
         """
         path = self.get_script_path()
-        self.ImmoscoutScrape(memoryLocation=path + "\\")
-        # TODO missing return
 
-    def URLSplitter(self):  # TODO rename method url_splitter
-        """
-        splits the URL and returns the main page, so the
-        varying parts of the URL can later be added
-        :return:
-        """
-        return self.url.split('/')[2]  # TODO if possible direct return - like this
+        return self.ImmoscoutScrape(memoryLocation=path + "\\")
 
-    def get_URLUnterseite(self, expose_id):  # TODO rename class to english with underscore, build_url?
+
+    def URLSplitter(self):
+        """
+        :return list:
+        """
+        L = (self.url.split('/'))
+
+        if len(L) == 8:
+            a = L[5].split('-')
+            residence = a[0]
+            payment = a[1]
+            state = L[6]
+            city = L[7]
+            # splits the URL and gathers information if it is a house or flat, if it is for rent or to buy
+            # and in which state/city the property is
+            Liste = [residence, payment, state, city]
+
+        # len(L)==9
+        else:
+            a = L[5].split('-')
+            residence = a[0]
+            payment = a[1]
+            state = L[6] + "/" + L[7]
+            city = L[8]
+            # splits the URL and gathers information if it is a house or flat, if it is for rent or to buy
+            # and in which state/city the property is
+            Liste = [residence, payment, state, city]
+        return Liste
+
+    def get_city(self):
+        """
+        :return string:
+        """
+        return self.URLSplitter()[-1]
+
+    def get_subpageUrl(self, property_id):
         """
         uses the returned main part of the URl and adds the
-        parts to create the URL for the single exposé
-        :param expose_id:
-        :return:
+        parts to create the URL for the single property
+        :param property_id:
+        :return string:
         """
-        return self.URLSplitter() + '/' + expose_id  # TODO rename parameter with underscore like this
 
-    def get_soup(self):  # TODO Execption handling?
+        return self.IS24_URL + '/' + property_id
+
+    def get_soup(self):
         """
         Use of the BeautifulSoup4 package to get the source code of the URL
-        :return:
+        :return soup:
         """
-        return bs.BeautifulSoup(self.open_stream(),  # TODO zur uebersichtlichkeit jeder parameter in eine eigene Zeile, wenn möglich mit parametername = parameter
+
+        try:
+            return bs.BeautifulSoup(self.open_stream(),
                                 'lxml')
+        except Exception as e:
+            print(str(datetime.now()) + ": " + str(e))
+
 
     def open_stream(self):
         """
-
-        :return:
+        :return bytes:
         """
-        stream = urllib.request.urlopen(self.url).read()  # TODO jede Klasse soll eine Aufgabe haben
-        return stream
 
-    def get_numberOfPages(self):  # TODO rename method with underscore
+        return urllib.request.urlopen(self.url).read()
+
+    def get_numberOfPages(self):
         """
         Gets the number of all pages for the chosen city/place
-        :return:
+        :return int:
         """
         entries = self.get_real_estate_entries(self.get_soup())
         return entries['paging']['numberOfPages']
 
-    def get_nextPage(self):  # TODO s.o.
+    def get_nextPage(self):
         """
         Searches in the source code for the href to the next page
-        :return:
+        :return string:
         """
         entries = self.get_real_estate_entries(self.get_soup())
         return entries['paging']['next']['@xlink.href']
 
-    def get_keyValues(self, soup):  # TODO s.o. und wenn self nicht gebraucht wird, kennzeichnet die methode als static  -> @staticmethod
+    @staticmethod
+    def get_keyValues(soup):
         """
         filters the important data out of the source code
         :param soup:
-        :return:
+        :return dict:
         """
-        paragraph = str(soup.find_all("script"))  # TODO gewoehnt euch an, komplexe konstruktre zu vereinfachen
+        paragraph = str(soup.find_all("script"))
         key_values = paragraph.split("keyValues = ")[1]
         key_values_json = json.loads(key_values.split("}")[0] + str("}"))
 
         return pd.DataFrame(data=key_values_json,
                             index=[str(datetime.now())])
 
-    def get_description(self, data, exposeid, soup):  # TODO falls keine Beschreibung gefunden wurde try except
+    @staticmethod
+    def get_description(data, soup):
         """
-        gets the description of each exposé
+        gets the description of each property
         :param data:
-        :param exposeid:
+        :param property_id:
         :param soup:
-        :return:
+        :return list:
         """
-        data["URL"] = str(exposeid)  # Wieso wird hier die zuweisung durchgefuehrt?
-        description = []
-        #description is placedd in the pre tag of the source code
-        for i in soup.find_all("pre"):
-            description.append(i.text)  # ist jedes pre = beschreibung? gff. weiter filtern?
-        data["description"] = str(description)  # methoden lieber mit return und keine direkte zuweisung, macht die in der eigenlichen logik damit bleibt der code konsistent und einheitlich / nachvollziehbar
+        try:
+            description = []
+            #description is placed in the pre tag of the source code
+            for i in soup.find_all("pre"):
+                description.append(i.text)
+            data["description"] = str(description)
+            return description
 
-    def DF2CSV(self, Pfad, df):  # TODO variablen umbenennen - englisch, ist der ausgabe pfad nicht als eingabe sinnvoll __init__?
+        except Exception as e:
+            print(str(datetime.now()) + ": " + str(e))
+
+    @staticmethod
+    def DF2CSV(path, df):  # TODO ist der ausgabe pfad nicht als eingabe sinnvoll __init__?
         """
         function to transform a Pandas dataframe into a CSV
-        :param Pfad:
+        :param path:
         :param df:
-        :return:
+        :return none:
         """
-        print("Exportiert CSV")  # english
+        print("Creating CSV")
 
         date = str(datetime.now())[:19].replace(":", "").replace(".", "")
-        path = Pfad + date + ".csv"
+        path = path + date + ".csv"
 
         df.to_csv(path,
                   sep=';',
                   decimal=',',
                   encoding='utf-8',
-                  index_label='timestamp')  # TODO index umbenennen timestamp suggeriert das einstelldatum
+                  date_label='timestamp')
 
     def get_real_estate_entries(self, soup):
         """
-
         :param soup:
-        :return:
+        :return dict:
         """
+
         # get all script elements
         for paragraph in soup.find_all("script"):
             # get exposes script element
@@ -156,7 +196,7 @@ class ImmoScout24Scrapper:
         """
         Transforms string to JSON
         :param string:
-        :return:
+        :return dict:
         """
         string = string.strip()
         string_json = json.loads((string[17:-1]))
@@ -164,56 +204,50 @@ class ImmoScout24Scrapper:
 
     def ImmoscoutScrape(self, memoryLocation: str):
         """
-        function to run through all pages and get data from each exposé
+        function to run through all pages and get data from each property
         :param memoryLocation:
-        :return:
+        :return pandas dataframe:
         """
-        allPages = self.get_numberOfPages()  # TODO variable lower case
-        currentPage = 1  # TODO variable underscore
+        all_pages = self.get_numberOfPages()
+        current_page = 1
 
         # geocoder for geocoding addresses
         g = Geocoder()
 
         # daten container fuer alle datensaetze
-        data = pd.DataFrame()
-
+        all_data=pd.DataFrame()
+        df = pd.DataFrame()
+        data=pd.DataFrame()
         # stops at last page
-        while (currentPage <= allPages):
-            #df = pd.DataFrame()
+        while (current_page <= all_pages):
+
 
             try:
-                # was passiert hier? immer beschreiben
-                entries = self.get_real_estate_entries(self.get_soup())  # Das wuerde ich in Beschreibung umbenennen
-                #return entries['paging', 'next', '@xlink.href']
+                # gathers the information out of the soup object for each property entry
+                entries_information = self.get_real_estate_entries(self.get_soup())
+                #return entries_information['paging', 'next', '@xlink.href']
 
-                # s.o.
-                resultEntry = entries['resultlistEntries'][0]['resultlistEntry']  # als methode definieren - get_entries, mehrzahl
+                # filters all given information for relevant data
+                resultEntry = entries_information['resultlistEntries'][0]['resultlistEntry']
 
-                for i in resultEntry:  # i = entry
-                    # inserat = pd.DataFrame(i, index=[i['@id']])
-                    exposeid = i['@id']
+                for property_main_page in resultEntry:
 
-                    # elemente der hauptseite = i
-                    # zusammenfassen mit underscore
-                    expose_sub_page = flatten(d=i, # TODO variable umbenennen
+                    property_id = property_main_page['@id']
+
+                    property_main_page = flatten(d=property_main_page,
                                               reducer=self.underscore_reducer)
 
-                    # elemente der unterseite = inserat # TODO umbenennen
-                    expose_sub_page = self.get_Unterseite(exposeid, df)
-
-                    # zusammenfassen mit underscore
-                    expose_sub_page = flatten(d=expose_sub_page,
+                    # elements of sub page
+                    property_sub_page = self.get_subpage(property_id, df)
+                    property_sub_page = flatten(d=property_sub_page,
                                               reducer=self.underscore_reducer)
 
-                    # daten aus hauptseite mit unterseite zusammenfügen
+                    # connect data from sub page with main page data
                     # achtung nestes dict -> flatten
-                    data_expose = {**i, **expose_sub_page}
+                    data_property = {**property_main_page, **property_sub_page}
 
-                    """
-                    hier johannes marlena teil
-                    """
 
-                    mod = ImmoDataModel(data_expose)
+                    mod = ImmoDataModel(data_property)
 
                     # geocode address and set coordinates
                     coord = g.geocode(mod.get_address())
@@ -221,8 +255,8 @@ class ImmoScout24Scrapper:
 
 
 
-                    #inserat = inserat.append(expose_sub_page)
-                    #print(exposeid)
+                    #inserat = inserat.append(property_sub_page)
+                    #print(property_id)
                     data = data.append(mod.get_data(),
                                        sort=True)
 
@@ -233,39 +267,45 @@ class ImmoScout24Scrapper:
                 self.DF2CSV(memoryLocation, data)
 
                 # set Url to the next page to check
-                nextPage = self.get_nextPage() # TODO rename variable
-                self.url = self.IS24_URL + nextPage  # TODO Konstanten definieren
-                print(self.url)  # fuer ausgaben immer mehr kontext :-)
+                next_page = self.get_nextPage()
+
+                self.url = self.IS24_URL + next_page
+
 
             except Exception as e:
                 print(str(datetime.now()) + ": " + str(e))
 
             # increment page
-            currentPage = currentPage + 1
+            current_page = current_page + 1
+            all_data=all_data.append(data)
 
-    def get_Unterseite(self, exposeid, df):  # TODO umbenennen
+        return all_data
+    def get_subpage(self, property_id, df):
         """
-        Method to extract KeyValues(relevant data) out of the script tags for each exposé
-        :param exposeid: # TODO underscore
+        Method to extract KeyValues(relevant data) out of the script tags for each property
+        :param property_id:
         :param df:
-        :return:
+        :return DataFrame:
         """
-
 
         try:
-            urlUnterseite = self.get_URLUnterseite(exposeid)  # english and underscore
+            url_subpage = self.get_subpageUrl(property_id)  # english and underscore
 
-            soup = self.get_soup('http://' + urlUnterseite) # http mit in die url builder methode packen
+            url_h = self.url
+
+            self.url=url_subpage
+
+            soup = self.get_soup() # http mit in die url builder methode packen
             # Key Value Pairs aus HTMl ziehen und in JSON speichern
+
+            self.url = url_h
             data = self.get_keyValues(soup)
-            self.get_description(data, exposeid, soup)  # TODO objektbeschreibung, ausstattung und lage enthalten?
-            # get_description mit return
-            # data = dataframe? -> data.append(description)
+            self.get_description(data, soup)  # TODO objektbeschreibung, ausstattung und lage enthalten? ja ist enthalten
             df = df.append(data, sort=True)
+            return df
+
         except Exception as e:
             print(str(datetime.now()) + ": " + str(e))
-
-        return df # return in try - data als return
 
     @staticmethod
     def underscore_reducer(k1, k2):
@@ -278,20 +318,21 @@ class ImmoScout24Scrapper:
     def get_script_path():
         """
         Function to set storage location to the location of the script file
-        :return:
+        :return file Directory as string:
         """
         return os.path.dirname(os.path.abspath(__file__))
 
 
+
 if __name__ == "__main__":
-    # single expose
+    # single property
     test_url = 'https://www.immobilienscout24.de/Suche/S-2/P-1/Wohnung-Miete/Rheinland-Pfalz/Zweibruecken/Ixheim'
 
     # url studyarea
-    url = 'https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Nordrhein-Westfalen/Essen' # TODO wir untersuchen mieten, keine haeuser :-)
+    url = 'https://www.immobilienscout24.de/Suche/S-T/Wohnung-Miete/Nordrhein-Westfalen/Essen'
 
     # Initialization of the class
     my_Scraper = ImmoScout24Scrapper(url=url)
 
     # Run main method
-    my_Scraper.execute()
+my_Scraper.execute()
