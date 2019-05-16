@@ -1,5 +1,5 @@
 """
-Description: # TODO class description is missing
+Description:  Data model for uniform storage of the scraped data of Immobilienscout24 webpage
 Author: Marlena Hecker, marlena.hecker@hs-bochum.de
 """
 
@@ -11,12 +11,14 @@ class ImmoDataModel:
     def __init__(self, data):
         self.init_data = data
         self.data = self.prepare_data()
+        self.set_type()
 
     def prepare_data(self):
         """
-        # TODO description is missing
-        :param data: Pandas DataFrame or Dict
-        :return:
+        Extracts relevant data from the input data
+        :param data: pandas.DataFrame or Dict
+        :return: pandas.DataFrame
+            It returns a pandas.DataFrame, which contains the unified data of the scraper
         """
         # extract data
 
@@ -106,9 +108,11 @@ class ImmoDataModel:
 
     def get_element(self, key):
         """
-        TODO description is missing
+            Searches in the "init_data" for a "key" and returns the value or a empty string
         :param key: str
-        :return: value
+            Searching "key"
+        :return: value: any type
+            Returns the found value and if the "key" does not exist, an empty string is returned
         """
         try:
             if isinstance(self.init_data.get(key), pd.Series) or isinstance(self.init_data.get(key), pd.DataFrame):
@@ -125,17 +129,23 @@ class ImmoDataModel:
 
     @staticmethod
     def string_2_bool(value):
+        """
+        Changes a string value into a boolean True or False based on a word list for strings that have the meaning of
+        True
+        :param value: str
+        :return: boolean (True or False)
+        """
         return value.lower() in ("y", "true")
 
     def set_type(self):
         """
-        Set type of data
-        :return:
+        Sets the types for all columns of the data
+        :return: None
         """
         try:
-            self.data.astype(dtype={
+            self.data = self.data.astype(dtype={
                                     #  "date_start": "str",
-                                    "expose_id": "int64",
+                                    "expose_id": "int",
                                     "street": "str",
                                     "street_hsno": "str",
                                     "postcode": "str",  # Because it always has to have 5 digits
@@ -152,7 +162,7 @@ class ImmoDataModel:
                                     "living_space": "float",
                                     "sqm_price": "float",
                                     "num_rooms": "float",
-                                    "num_parking_spaces":"float",
+                                    "num_parking_spaces": "str",
                                     "fitted_kitchen": "bool",
                                     "balcony": "bool",
                                     "garden": "bool",
@@ -171,7 +181,8 @@ class ImmoDataModel:
                                     "last_refurbish": "int",
                                     "heating_costs": "float",
                                     "description": "str"
-                                    })
+                                    }
+            )
         except ValueError as e:
             print(e)
 
@@ -180,19 +191,24 @@ class ImmoDataModel:
 
     @property
     def get_data(self):
+        """
+        Getter, returns the data as a DataFrame
+        :return: pandas.DataFrame
+        """
         return self.data
 
     def get_address(self):
         """
-        Return address (e.g. for geocoder)
-        :return:
+        Return an address as a String (e.g. for geocoder) It´s composed of street and house number
+        :return: str
         """
         return self.data["street"].values[0] + " " + self.data["street_hsno"].values[0]
 
     def set_coordinates(self, coordinates):
         """
-        Set coordinates from geocoder
-        :param coordinates: dict (accuracy, lat, lon, x, y)
+        Gets coordinates as an input (e.g. from geocoder) and stores them in separate columns in the "data"
+        :param coordinates: dict (accuracy, x, y)
+        :return: None
         """
         self.data = self.data.assign(x=coordinates.get("x"))
         self.data = self.data.assign(y=coordinates.get("y"))
