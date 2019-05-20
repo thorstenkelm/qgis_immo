@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-# Author: Thorsten Kelm, thorsten.kelm@hs-bochum.de
+"""
+Class for the provision of ALKIS house coordinates in NRW
+Author: Fabian Hannich, fabian.hannich@hs-bochum.de
+"""
+
 
 import urllib.request
 import zipfile
@@ -8,89 +12,60 @@ from pathlib import Path
 
 
 class BuildingReferences:
-    GEBREF_URL = 'https://www.opengeodata.nrw.de/produkte/geobasis/lika/alkis_sek/gebref/gebref_EPSG4647_ASCII.zip'
 
-    def __init__(self, studyarea, savepath):
-        self.savepath = savepath
-        self.download_data()
-        self.__studyarea = studyarea
-        self.__gebref_keys = self.read_keys(savepath + '/gebref_schluessel.txt')
-        self.__city_key = self.get_city_key()
-        self.__gebref = self.read_data(savepath + 'gebref.txt')
+    GEBREF_URL = 'https://www.opengeodata.nrw.de/produkte/geobasis/lika/alkis_sek/gebref/gebref_EPSG4647_ASCII.zip'
+    COLUMNS = ['stn', 'hsr', 'adz', 'east', 'north', ]
+
+    def __init__(self, city, path):
+        self.path = path
+        self.city = city
+
+        self.gebref_zip_path = path + '/gebref_EPSG4647_ASCII.zip'
+        self.gebref_path = path + '/gebref.txt'
+        self.gebref_key_path = path + '/gebref_schluessel.txt'
+        self.gebref_city_path = path + '/' + city + '.csv'
+
+        # Gebref city is available
+        if Path(self.gebref_city_path).is_file():
+            # import city_gebref
+            self.gebref = self.read_city_gebref()
+
+        # Gebref ALKIS is not available
+        elif not Path(self.gebref_zip_path).is_file():
+                # download gebref raw file
+                self.download_data()
+
+        else:
+            # get keys
+            self.gebref_keys = self.read_keys()
+            self.city_key = self.get_city_key()
+
+            # import data
+            raw_gebref = self.read_raw_gebref()
+
+            # subset data
+            city_gebref = self.subset_gebref(gebref=raw_gebref)
+            city_gebref = self.select_col(gebref=city_gebref)
+            self.gebref = self.transform_address(gebref=city_gebref)
+
+            # export data to file system
+            self.gebref2csv()
 
     def download_data(self):
-        gebref_file = Path(self.savepath + '/gebref.txt')
-        if gebref_file.is_file():
-            print("The gebref-file already exists!")
-
-        else:
-            print("Beginning file download...")
-            urllib.request.urlretrieve(self.GEBREF_URL, self.savepath + 'gebref.zip')
+        try:
+            print("Download ALKIS data...")
+            urllib.request.urlretrieve(url=self.GEBREF_URL,
+                                       filename=self.gebref_zip_path)
             print("Unpack file...")
-            zipfile.ZipFile(self.savepath + '/gebref.zip', 'r').extractall(self.savepath)
+            zipfile.ZipFile(file=self.gebref_zip_path).extractall(self.path)
+        except Exception as e:
+            print('Download data: ' + str(e))
 
-    # read gebref-data and assign type
-    def read_data(self, gebref_path):
-
-        gebref_edit = Path(self.savepath + '/gebref_edit.txt')
-        if gebref_edit.is_file():
-            print("The gebref_edit-file already exists!")
-
-            gebref_bearbeitet = pd.read_csv(gebref_edit,
-                                            sep=',',
-                                            decimal='.',
-                                            header=0,
-                                            names=['lan', 'rbz', 'krs', 'gmd', 'hsr',
-                                                   'adz', 'east', 'north', 'stn'],
-                                            dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
-                                                   'adz': str, 'east': float, 'north': float, 'stn': str},
-                                            encoding='ISO-8859-1')
-
-            # fill empty lines
-            gebref_bearbeitet.fillna('', inplace=True)
-
-        else:
-            print("Read, filter and encoding gebref_data..")
-            gebref_data = pd.read_csv(gebref_path,
-                                      sep=';',
-                                      decimal=',',
-                                      header=None,
-                                      names=['nba', 'oi', 'qua', 'lan', 'rbz', 'krs', 'gmd',
-                                             'ott', 'sss', 'hsr', 'adz', 'east', 'north', 'stn'],
-                                      usecols=['lan', 'rbz', 'krs', 'gmd', 'hsr',
-                                               'adz', 'east', 'north', 'stn'],
-                                      dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
-                                             'adz': str, 'east': float, 'north': float, 'stn': str},
-                                      encoding='ISO-8859-1')
-
-            # fill empty lines
-            gebref_data.fillna('', inplace=True)
-
-            # filter the gebref_data
-            gebref_data = gebref_data >> mask(X.lan == self.__city_key['lan'].values[0],
-                                              X.rbz == self.__city_key['rbz'].values[0],
-                                              X.krs == self.__city_key['krs'].values[0],
-                                              X.gmd == self.__city_key['gmd'].values[0])
-
-            # text encoding
-            gebref_bearbeitet = gebref_data.replace("str.", "str", regex=True) \
-                .replace("Str.", "str", regex=True) \
-                .replace("Ã¼", "ue", regex=True) \
-                .replace("Ã¤", "ae", regex=True) \
-                .replace("Ã¶", "oe", regex=True) \
-                .replace("Ã", "ss", regex=True) \
-                .replace(" ", "", regex=True)
-
-            # save as a data that called gebref
-            gebref_bearbeitet.to_csv(self.savepath + '/gebref_edit.txt', index=False)
-
-        return gebref_bearbeitet
-
-    # read gebref_keys-data and assign types
-    @staticmethod
-    def read_keys(gebref_keys_path):
-        print("Read and filter gebraf_keys-data..")
-        gebref_keys = pd.read_csv(gebref_keys_path,
+    def read_keys(self):
+        """
+        Get keys from gebref
+        """
+        gebref_keys = pd.read_csv(self.gebref_key_path,
                                   header=None,
                                   names=['type', 'lan', 'rbz',
                                          'krs', 'gmd', 'nam'],
@@ -99,36 +74,87 @@ class BuildingReferences:
                                          'krs': str, 'gmd': str, 'nam': str},
                                   encoding='utf-8')
 
-        # filter types = G
-        # gebref_keys = gebref_keys.loc[lambda df: df.type == 'G', :]
-        gebref_keys = gebref_keys >> mask(X.type == 'G')
+        # filter types
+        return gebref_keys >> mask(X.type == 'G')
 
-        return gebref_keys
-
-    # filter gebref_keys from Essen
     def get_city_key(self):
-        return self.gebref_keys >> mask(X.nam == self.__studyarea)
+        """
+        Get key from given city
+        """
+        return self.gebref_keys >> mask(X.nam == self.city)
 
-    # Getter
-    @property
-    def gebref(self):
-        return self.__gebref
+    def subset_gebref(self, gebref):
+        """
+        Subset gebref by given city key
+        """
+        return gebref >> mask(X.lan == self.city_key['lan'].values[0],
+                              X.rbz == self.city_key['rbz'].values[0],
+                              X.krs == self.city_key['krs'].values[0],
+                              X.gmd == self.city_key['gmd'].values[0])
 
-    @property
-    def gebref_keys(self):
-        return self.__gebref_keys
+    def select_col(self, gebref):
+        """
+        Subset columns of gebref
+        """
+        return gebref >> select(self.COLUMNS)
 
-    @property
-    def city_key(self):
-        return self.__city_key
+    def read_raw_gebref(self):
+        """
+        Read raw gebref file from file system
+        """
+        gebref_data = pd.read_csv(self.gebref_path,
+                                  sep=';',
+                                  decimal=',',
+                                  header=None,
+                                  names=['nba', 'oi', 'qua', 'lan', 'rbz', 'krs', 'gmd',
+                                         'ott', 'sss', 'hsr', 'adz', 'east', 'north', 'stn'],
+                                  usecols=['lan', 'rbz', 'krs', 'gmd', 'hsr',
+                                           'adz', 'east', 'north', 'stn'],
+                                  dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
+                                         'adz': str, 'east': float, 'north': float, 'stn': str},
+                                  encoding='ISO-8859-1')
 
-    @property
-    def studyarea(self):
-        return self.studyarea
+        # fill empty lines
+        gebref_data.fillna('', inplace=True)
+        return gebref_data
+
+    def read_city_gebref(self):
+        gebref_data = pd.read_csv(self.gebref_city_path,
+                                  sep=',',
+                                  decimal='.',
+                                  header=0,
+                                  names=['lan', 'rbz', 'krs', 'gmd', 'hsr',
+                                         'adz', 'east', 'north', 'stn'],
+                                  dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
+                                         'adz': str, 'east': float, 'north': float, 'stn': str},
+                                  encoding='ISO-8859-1')
+
+        # fill empty lines
+        gebref_data.fillna('', inplace=True)
+        return gebref_data
+
+    @staticmethod
+    def transform_address(gebref):
+        return gebref.replace("str.", "str", regex=True)\
+            .replace("Str.", "str", regex=True) \
+            .replace("Ã¼", "ue", regex=True) \
+            .replace("Ã¤", "ae", regex=True) \
+            .replace("Ã¶", "oe", regex=True) \
+            .replace("Ã", "ss", regex=True) \
+            .replace(" ", "", regex=True)
+
+    def gebref2csv(self):
+        """
+        Save as a data that called gebref
+        """
+        self.gebref.to_csv(self.gebref_city_path,
+                           index=False,
+                           sep=';',
+                           decimal='.')
 
 
-# start class BuildingReferences
 if __name__ == '__main__':
-    br = BuildingReferences(studyarea='Essen',
-                            savepath='C:/Users/Fabian Hannich/Documents/Studium/6. '
-                                     'Semester/GI-Projekt_Immo/Hauskoordinaten_gebref_EPSG4647_ASCII/')
+    br = BuildingReferences(city='Essen',
+                            path='C:/gebref')
+
+    print(br.gebref)
