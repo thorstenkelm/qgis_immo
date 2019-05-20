@@ -1,6 +1,10 @@
 """
-Description: # TODO class description is missing
+Description: Class to get the coordinates from
+            the addresses. If the address does
+            not exist in the ALKIS dataset,
+            you will get them about OpenStrretMap.
 Author: Lena Karweg, lena.karweg@hs-bochum.de
+        Fabian Hannich, fabian.hannich@hs-bochum.de
 """
 
 import geocoder
