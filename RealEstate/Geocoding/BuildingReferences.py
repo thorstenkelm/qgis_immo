@@ -25,41 +25,62 @@ class BuildingReferences:
         self.gebref_key_path = path + '/gebref_schluessel.txt'
         self.gebref_city_path = path + '/' + city + '.csv'
 
+        self.data = self.import_data()
+
+    def download_data(self):
+        """
+        Download data
+        """
+        try:
+            print("Download ALKIS data to", self.gebref_zip_path, "...")
+            urllib.request.urlretrieve(url=self.GEBREF_URL,
+                                       filename=self.gebref_zip_path)
+        except Exception as e:
+            print('Download data: ' + str(e))
+
+    def unzip_data(self):
+        """
+        Unzip data
+        """
+        try:
+            print("Unpack file...")
+            zipfile.ZipFile(file=self.gebref_zip_path).extractall(self.path)
+        except Exception as e:
+            print('Unzip data: ' + str(e))
+
+    def import_data(self):
+        """
+        Import gebref data from file system
+        """
         # Gebref city is available
         if Path(self.gebref_city_path).is_file():
             # import city_gebref
-            self.gebref = self.read_city_gebref()
+            print("GEBREF2")
+            return self.read_city_gebref()
 
         # Gebref ALKIS is not available
-        elif not Path(self.gebref_zip_path).is_file():
-                # download gebref raw file
-                self.download_data()
+        if not Path(self.gebref_zip_path).is_file():
+            # download gebref raw file
+            print("GEBREF3")
+            self.download_data()
+            self.unzip_data()
 
-        else:
-            # get keys
-            self.gebref_keys = self.read_keys()
-            self.city_key = self.get_city_key()
+            gebref_keys = self.read_keys()
+            city_key = self.get_city_key(gebref_keys)
 
             # import data
             raw_gebref = self.read_raw_gebref()
 
             # subset data
-            city_gebref = self.subset_gebref(gebref=raw_gebref)
+            city_gebref = self.subset_gebref(gebref=raw_gebref,
+                                             city_key=city_key)
             city_gebref = self.select_col(gebref=city_gebref)
-            self.gebref = self.transform_address(gebref=city_gebref)
+            city_gebref = self.transform_address(gebref=city_gebref)
 
             # export data to file system
-            self.gebref2csv()
+            self.gebref2csv(city_gebref)
 
-    def download_data(self):
-        try:
-            print("Download ALKIS data...")
-            urllib.request.urlretrieve(url=self.GEBREF_URL,
-                                       filename=self.gebref_zip_path)
-            print("Unpack file...")
-            zipfile.ZipFile(file=self.gebref_zip_path).extractall(self.path)
-        except Exception as e:
-            print('Download data: ' + str(e))
+            return city_gebref
 
     def read_keys(self):
         """
@@ -77,20 +98,21 @@ class BuildingReferences:
         # filter types
         return gebref_keys >> mask(X.type == 'G')
 
-    def get_city_key(self):
+    def get_city_key(self, gebref_keys):
         """
         Get key from given city
         """
-        return self.gebref_keys >> mask(X.nam == self.city)
+        return gebref_keys >> mask(X.nam == self.city)
 
-    def subset_gebref(self, gebref):
+    @staticmethod
+    def subset_gebref(gebref, city_key):
         """
         Subset gebref by given city key
         """
-        return gebref >> mask(X.lan == self.city_key['lan'].values[0],
-                              X.rbz == self.city_key['rbz'].values[0],
-                              X.krs == self.city_key['krs'].values[0],
-                              X.gmd == self.city_key['gmd'].values[0])
+        return gebref >> mask(X.lan == city_key['lan'].values[0],
+                              X.rbz == city_key['rbz'].values[0],
+                              X.krs == city_key['krs'].values[0],
+                              X.gmd == city_key['gmd'].values[0])
 
     def select_col(self, gebref):
         """
@@ -120,13 +142,11 @@ class BuildingReferences:
 
     def read_city_gebref(self):
         gebref_data = pd.read_csv(self.gebref_city_path,
-                                  sep=',',
+                                  sep=';',
                                   decimal='.',
                                   header=0,
-                                  names=['lan', 'rbz', 'krs', 'gmd', 'hsr',
-                                         'adz', 'east', 'north', 'stn'],
-                                  dtype={'lan': str, 'rbz': str, 'krs': str, 'gmd': str, 'hsr': str,
-                                         'adz': str, 'east': float, 'north': float, 'stn': str},
+                                  names=['stn', 'hsr', 'adz', 'east', 'north'],
+                                  dtype={'stn': str, 'hsr': str, 'adz': str, 'east': float, 'north': float},
                                   encoding='ISO-8859-1')
 
         # fill empty lines
@@ -141,20 +161,21 @@ class BuildingReferences:
             .replace("Ã¤", "ae", regex=True) \
             .replace("Ã¶", "oe", regex=True) \
             .replace("Ã", "ss", regex=True) \
-            .replace(" ", "", regex=True)
+            .replace(" ", "", regex=True) \
+            .replace("-", "", regex=True)
 
-    def gebref2csv(self):
+    def gebref2csv(self, gebref):
         """
         Save as a data that called gebref
         """
-        self.gebref.to_csv(self.gebref_city_path,
-                           index=False,
-                           sep=';',
-                           decimal='.')
+        gebref.to_csv(self.gebref_city_path,
+                      index=False,
+                      sep=';',
+                      decimal='.')
 
 
 if __name__ == '__main__':
     br = BuildingReferences(city='Essen',
-                            path='C:/gebref')
+                            path='C:/Users/Kelm/Desktop/gebref')
 
-    print(br.gebref)
+    print(br.data >> head)
