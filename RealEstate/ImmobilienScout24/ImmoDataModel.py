@@ -21,7 +21,7 @@ class ImmoDataModel:
         """
         # meta information
         expose_id = self.get_element('@id')
-        title = self.get_element('resultlist.realEstate_title')
+        title = self.get_element('resultlist.realEstate_title').replace("\n", "").replace("\/", "/")
 
         # real estate provider
         private_offer = self.string_2_bool(self.get_element('resultlist.realEstate_privateOffer'))
@@ -115,7 +115,10 @@ class ImmoDataModel:
         cellar = self.string_2_bool(self.get_element('obj_cellar'))
         lift = self.string_2_bool(self.get_element('obj_lift'))
         shared_flat_suitable = self.shared_flat_suitable(self.get_element('realEstateTags_tag'))
-        tags = '; '.join(self.get_element('realEstateTags_tag'))
+
+        tags = self.get_element('realEstateTags_tag')
+        if isinstance(tags, list):
+            tags = ', '.join(tags)
 
         # energy
         heating_type = self.get_element('obj_heatingType')
@@ -266,19 +269,9 @@ class ImmoDataModel:
                 return self.init_data[key]
 
         except KeyError as e:
-            # print('Element not found: ', e)
+            print('Element not found: ', e)
             # no element in data and return empty string
             return ''
-
-    @staticmethod
-    def shared_flat_suitable(attr):
-        return "WG-geeignet" in attr
-
-    def pets_allowed(self, attr):
-        if attr in ("y", "true"):
-            return self.string_2_bool(attr)
-        else:
-            return attr
 
     @staticmethod
     def string_2_bool(value):
@@ -296,57 +289,15 @@ class ImmoDataModel:
         tail = house_number[len(head):]
         return head, tail
 
-    def set_type(self):
-        """
-        Sets the types for all columns of the data
-        :return: None
-        """
-        try:
-            self.data = self.data.astype(dtype={
-                                    #  "date_start": "str",
-                                    "expose_id": "int",
-                                    "street": "str",
-                                    "street_hsno": "str",
-                                    "postcode": "str",  # Because it always has to have 5 digits
-                                    "city": "str",
-                                    "title": "str",
-                                    "private_offer": "bool",
-                                    "rent_gross_eur": "float",
-                                    "rent_gross_marketing_type": "str",
-                                    "rent_gross_interval_type": "str",
-                                    "rent_net_eur": "float",
-                                    "rent_net_marketing_type": "str",
-                                    "rent_net_interval_type": "str",
-                                    "rent_scope": "str",
-                                    "living_space": "float",
-                                    "sqm_price": "float",
-                                    "num_rooms": "float",
-                                    "num_parking_spaces": "str",
-                                    "fitted_kitchen": "bool",
-                                    "balcony": "bool",
-                                    "garden": "bool",
-                                    "cellar": "bool",
-                                    "lift": "bool",
-                                    "fully_accessible": "bool",
-                                    "assisted_living": "bool",
-                                    "object_state": "str",
-                                    "floor": "int",
-                                    "firing_type": "str",
-                                    "heating_type": "str",
-                                    "real_estate_type": "str",
-                                    "interior_quality": "str",
-                                    "flat_type": "str",
-                                    "year_construction": "int",
-                                    "last_refurbish": "int",
-                                    "heating_costs": "float",
-                                    "description": "str"
-                                    }
-            )
-        except ValueError as e:
-            print(e)
+    @staticmethod
+    def shared_flat_suitable(attr):
+        return "WG-geeignet" in attr
 
-        except AttributeError as e:
-            print(e)
+    def pets_allowed(self, attr):
+        if attr in ("y", "true"):
+            return self.string_2_bool(attr)
+        else:
+            return attr
 
     @property
     def get_data(self):
@@ -368,7 +319,6 @@ class ImmoDataModel:
                 "street_house_number": self.data['street_house_number'].values[0],
                 "house_number_supplement": self.data['house_number_supplement'].values[0],
                 "city": self.data['city'].values[0]}
-
 
     def check_coordinates(self):
         return self.data['X'].values[0] != 0 & self.data['Y'].values[0] != 0
