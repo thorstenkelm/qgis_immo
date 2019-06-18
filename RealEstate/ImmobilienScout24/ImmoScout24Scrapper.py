@@ -29,7 +29,7 @@ class ImmoScout24Scrapper:
         self.gebref = BuildingReferences(city=self.city,
                                          path=self.path)
 
-        print("Starting URL: "+self.url)
+        print("Starting URL: " + self.url)
         print("Number of pages: " + str(self.number_of_pages))
 
     def execute(self):
@@ -113,8 +113,12 @@ class ImmoScout24Scrapper:
         Searches in the source code for the href to the next page
         :return string:
         """
-        entries = self.get_real_estate_entries(self.get_soup())
-        return entries['paging']['next']['@xlink.href']
+        try:
+            entries = self.get_real_estate_entries(self.get_soup())
+            return entries['paging']['next']['@xlink.href']
+        except KeyError as e:
+            print(e)
+            return ""
 
     @staticmethod
     def get_key_values(soup):
@@ -250,6 +254,7 @@ class ImmoScout24Scrapper:
                                                   city=address['city'],
                                                   coord_available=mod_coord)
 
+                        # no geocoding worked, set origin coordinates
                         if coord:
                             mod.set_coordinates(coordinates=coord)
 
@@ -258,16 +263,16 @@ class ImmoScout24Scrapper:
 
                 # set Url to the next page to check
                 next_page = self.get_next_page()
-
                 self.url = self.IS24_URL + next_page
 
                 # increment page
-                current_page = current_page + 100
+                current_page = current_page + 1
 
             return df
 
         except Exception as e:
             print('Scrapper: ', str(datetime.now()) + ": " + str(e))
+            return df
 
     def get_sub_page(self, property_id):
         """
@@ -326,4 +331,10 @@ if __name__ == "__main__":
     # Run main method
     data = my_Scraper.execute()
 
-    my_Scraper.df2csv(data)
+    file_name = "-".join([datetime.now().strftime("%Y-%m-%d"), my_Scraper.city]) + ".csv"
+
+    data.to_csv(file_name,
+                sep=';',
+                decimal='.',
+                encoding='utf-8',
+                index=False)
