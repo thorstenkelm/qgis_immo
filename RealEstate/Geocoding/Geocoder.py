@@ -82,14 +82,13 @@ class Geocoder:
                 if subset_gebref.shape[0] > 1:
                     print("Geocoding ALKIS multiple results")
                     print(subset_gebref)
+                    return None
 
                 # geocode address
-                accuracy, x, y, source = self.geocode_osm(address_geocode)
+                print("Geocode address: ", address_geocode)
+                result = self.geocode_osm(address_geocode)
 
-                return self.return_data(x=x,
-                                        y=y,
-                                        accuracy=accuracy,
-                                        source=source)
+                return result
 
     @staticmethod
     def paste_address(city, house_number_supplement, street, street_house_number):
@@ -133,7 +132,7 @@ class Geocoder:
         """
         Normalize address
         """
-        return s.replace("Strasse", "str").replace("Straße.", "str").replace("str.", "str")\
+        return s.replace("Strasse", "str").replace("Straße.", "str") \
                 .replace("straße.", "str").replace("straße", "str").replace("strasse.", "str")\
                 .replace("str.", "str").replace("Str.", "str").replace("Ã¼", "ue").replace("Ã¤", "ae")\
                 .replace("Ã¶", "oe").replace("Ã", "ss").replace(" ", "").replace("-", "")
@@ -158,6 +157,7 @@ class Geocoder:
 
             if coder_osm.ok:
 
+                print("Extract coordinates")
                 json = coder_osm.geojson['features'][0]['properties']
 
                 # extract information
@@ -209,7 +209,7 @@ class Geocoder:
 
 if __name__ == '__main__':
     br = BuildingReferences(city='Essen',
-                            path='C:/Users/Kelm/Desktop/gebref')
+                            path='C:/gebref')
     g = Geocoder(gebref=br)
     coord = g.get_coordinates(street='Frrintroperstraße',
                               street_house_number='432',
