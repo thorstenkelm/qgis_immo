@@ -20,6 +20,7 @@ class BuildingReferences:
         self.path = path
         self.city = city
 
+        # set local paths
         self.gebref_zip_path = path + '/gebref_EPSG4647_ASCII.zip'
         self.gebref_path = path + '/gebref.txt'
         self.gebref_key_path = path + '/gebref_schluessel.txt'
@@ -55,13 +56,13 @@ class BuildingReferences:
         # Gebref city is available
         if Path(self.gebref_city_path).is_file():
             # import city_gebref
-            print("GEBREF2")
+            print("GEBREF in ", self.city, " is available")
             return self.read_city_gebref()
 
         # Gebref ALKIS is not available
         if not Path(self.gebref_zip_path).is_file():
             # download gebref raw file
-            print("GEBREF3")
+            print("Download GEBREF for ", self.city)
             self.download_data()
             self.unzip_data()
 
@@ -95,7 +96,7 @@ class BuildingReferences:
                                          'krs': str, 'gmd': str, 'nam': str},
                                   encoding='utf-8')
 
-        # filter types
+        # filter types by G (township)
         return gebref_keys >> mask(X.type == 'G')
 
     def get_city_key(self, gebref_keys):
@@ -176,6 +177,6 @@ class BuildingReferences:
 
 if __name__ == '__main__':
     br = BuildingReferences(city='Essen',
-                            path='C:/Users/Kelm/Desktop/gebref')
+                            path='C:/gebref')
 
     print(br.data >> head)
