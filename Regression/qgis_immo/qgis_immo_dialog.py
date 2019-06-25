@@ -25,9 +25,9 @@
 import os
 
 import pandas as pd
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtCore
 from PyQt5 import uic
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QTableWidgetItem
 from qgis.core import QgsProject
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
@@ -40,7 +40,6 @@ class gqisImmoDialog(QtWidgets.QDialog, FORM_CLASS):
     input_path = None  # saves input path
     separator = ";"  # saves the separator, defaults to ";"
     df = None  # saves the input csv as a pandas DataFrame
-    model = None  # saves the list view model
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -59,11 +58,11 @@ class gqisImmoDialog(QtWidgets.QDialog, FORM_CLASS):
         """
         input_path = self.input_file_path.text()
         if os.path.isfile(input_path):
-            df = pd.read_csv(input_path, sep=gqisImmoDialog.separator)
+            gqisImmoDialog.df = pd.read_csv(input_path, sep=gqisImmoDialog.separator)
             # get fieldnames
-            fieldnames = list(df.columns)
+            fieldnames = list(gqisImmoDialog.df.columns)
 
-            if self.target_field_combo.isEnabled() == False:
+            if self.target_field_combo.isEnabled() is False:
                 self.target_field_combo.setEnabled(True)
 
             # clear previous input
@@ -75,17 +74,17 @@ class gqisImmoDialog(QtWidgets.QDialog, FORM_CLASS):
 
             # save input path for later use
             gqisImmoDialog.input_path = input_path
-            # save df for later use
-            gqisImmoDialog.df = df
             # save fieldnames for later use
             gqisImmoDialog.fieldnames = fieldnames
 
-            gqisImmoDialog.fill_list_view_with_fieldnames(self)
             if self.regression_fields.isEnabled() == False:
                 self.regression_fields.setEnabled(True)
 
             if self.numeric_fields.isChecked():
                 self.filter_numeric_fields()
+
+            self.fill_regression_fields()
+
         else:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
@@ -93,6 +92,47 @@ class gqisImmoDialog(QtWidgets.QDialog, FORM_CLASS):
             msg.setText("The given filepath is not valid.")
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()  # show the messagebox
+
+    def fill_regression_fields(self):
+        """
+        Adds all fieldnames except the current target field name to regression_fields.
+        Adds two checkboxes after each fieldname. The first one indicates if this field should be used
+        for the regression. The second one indicates if this field should be used as categorical data.
+        """
+        # add columns and rows to regression_fields
+        self.regression_fields.setColumnCount(3)
+        self.regression_fields.setHorizontalHeaderLabels(["field", "use for regression", "is categorical"])
+        self.regression_fields.setRowCount(self.target_field_combo.count() - 1)
+
+        # for each field fill columns
+        target_passed = False
+        for index, field in enumerate(gqisImmoDialog.fieldnames):
+            if field == self.target_field_combo.currentText():
+                target_passed = True
+            else:
+                col_1 = QTableWidgetItem(field)
+                col_2 = QTableWidgetItem()
+                col_3 = QTableWidgetItem()
+
+                col_2.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                col_2.setCheckState(QtCore.Qt.Unchecked)
+                col_3.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                col_3.setCheckState(QtCore.Qt.Unchecked)
+
+                if target_passed:
+                    self.regression_fields.setItem(int(index) - 1, 0, col_1)
+                    self.regression_fields.setItem(int(index) - 1, 1, col_2)
+                    self.regression_fields.setItem(int(index) - 1, 2, col_3)
+                else:
+                    self.regression_fields.setItem(int(index), 0, col_1)
+                    self.regression_fields.setItem(int(index), 1, col_2)
+                    self.regression_fields.setItem(int(index), 2, col_3)
+
+        if self.numeric_fields.isEnabled() == False:
+            self.numeric_fields.setEnabled(True)
+
+        if self.numeric_fields.isChecked():
+            self.filter_numeric_fields()
 
     def select_file(self):
         # try to open the file selection dialog in the current project directory
@@ -117,6 +157,7 @@ class gqisImmoDialog(QtWidgets.QDialog, FORM_CLASS):
         if self.numeric_fields.isChecked() == True:
             # remove non numeric fields from list view and combo box
             # iterate over fields and check for each row if cell is numeric, empty or "NA"
+            print("filtered")
             for col in gqisImmoDialog.df:
                 numeric = True
                 for i, data in gqisImmoDialog.df[col].iteritems():
@@ -127,48 +168,17 @@ class gqisImmoDialog(QtWidgets.QDialog, FORM_CLASS):
                 if numeric is False:
                     # remove non numeric fields from target field
                     self.target_field_combo.removeItem(self.target_field_combo.findText(col))
-                    # remove non numeric fields from list view
 
-                    i = 0
-                    while gqisImmoDialog.model.item(i):
-                        if gqisImmoDialog.model.item(i).text() == col:
-                            gqisImmoDialog.model.removeRow(i)
-                        i += 1
+                    # remove non numeric fields from regression_fields
+                    for row in range(self.regression_fields.rowCount()):
+                        if self.regression_fields.item(row, 0).text() == col:
+                            self.regression_fields.removeRow(row)
+                            break
         else:
             # show all field names
+            print("all")
             gqisImmoDialog.fill_combo_box_with_fieldnames(self)
-            gqisImmoDialog.fill_list_view_with_fieldnames(self)
-
-    def fill_list_view_with_fieldnames(self):
-        """
-        Adds all fieldnames except the target field as list items.
-        """
-        model = QtGui.QStandardItemModel()
-        gqisImmoDialog.model = model
-        self.regression_fields.setModel(model)
-        for field in gqisImmoDialog.fieldnames:
-            if field == self.target_field_combo.currentText():
-                pass
-            else:
-                item = QtGui.QStandardItem(field)
-                model.appendRow(item)
-
-        if self.numeric_fields.isEnabled() == False:
-            self.numeric_fields.setEnabled(True)
-
-        if self.save_fields.isEnabled() == False:
-            self.save_fields.setEnabled(True)
-
-        if self.numeric_fields.isChecked():
-            self.filter_numeric_fields()
-
-    def save_fields(self):
-        """
-        TODO
-        saves which fields are selected when this method is called.
-        """
-        # ???
-        pass
+            gqisImmoDialog.fill_regression_fields(self)
 
     def set_separator(self):
         """

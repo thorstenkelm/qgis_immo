@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>521</width>
-    <height>656</height>
+       <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -260,66 +260,19 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_6">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
+            <widget class="QGroupBox" name="group_box_2">
+                <property name="title">
+                    <string>regression fields</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QLabel" name="fields_for_regression_label">
-             <property name="text">
-              <string>fields to use for regression</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QFrame" name="frame_3">
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_6">
-              <item>
-               <widget class="QListView" name="regression_fields">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>select the fields that should be used for the regression analysis</string>
-                </property>
-                <property name="editTriggers">
-                 <set>QAbstractItemView::NoEditTriggers</set>
-                </property>
-                <property name="alternatingRowColors">
-                 <bool>true</bool>
-                </property>
-                <property name="selectionMode">
-                 <enum>QAbstractItemView::MultiSelection</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>90</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
+               <widget class="QTableWidget" name="regression_fields">
+                   <property name="editTriggers">
+                       <set>QAbstractItemView::NoEditTriggers</set>
+                   </property>
+                   <property name="selectionMode">
+                       <enum>QAbstractItemView::NoSelection</enum>
+                   </property>
             </widget>
            </item>
           </layout>
@@ -355,7 +308,7 @@
               <bool>true</bool>
              </property>
              <property name="checked">
-              <bool>true</bool>
+                 <bool>false</bool>
              </property>
              <property name="autoRepeat">
               <bool>false</bool>
@@ -373,62 +326,6 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QFrame" name="frame_4">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <widget class="QCheckBox" name="save_fields">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>300</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>save currently selected fields for next use</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <property name="autoRepeat">
-              <bool>false</bool>
-             </property>
-             <property name="tristate">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>250</width>
                <height>20</height>
               </size>
              </property>
@@ -457,7 +354,6 @@
  <tabstops>
   <tabstop>target_field_combo</tabstop>
   <tabstop>numeric_fields</tabstop>
-  <tabstop>save_fields</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -497,7 +393,7 @@
    <sender>target_field_combo</sender>
    <signal>activated(QString)</signal>
    <receiver>gqisImmoDialogBase</receiver>
-   <slot>fill_list_view_with_fieldnames()</slot>
+      <slot>fill_regression_fields()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>241</x>

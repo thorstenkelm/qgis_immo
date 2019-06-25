@@ -23,8 +23,8 @@
 """
 import os.path
 
-import numpy as np
 import pandas as pd
+from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QMessageBox
@@ -196,6 +196,7 @@ class gqisImmo:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
+
             target_field = self.dlg.target_field_combo.currentText()
             # check if a target field was selected
             if len(target_field) == 0:
@@ -210,16 +211,14 @@ class gqisImmo:
 
             # get selected fields
             selected_fields = []
-            model = self.dlg.model
-            selected_indexes = self.dlg.regression_fields.selectedIndexes()
-            # sort list in case items were not selected trom top to bottom
-            selected_indexes.sort()
-            for index in selected_indexes:
-                i = 0
-                while model.item(i):
-                    if i == index.row():
-                        selected_fields.append(model.item(i).text())
-                    i += 1
+            categorical_fields = []
+
+            for row in range(self.dlg.regression_fields.rowCount()):
+                if self.dlg.regression_fields.item(row, 1).checkState() == QtCore.Qt.Checked:
+                    selected_fields.append(self.dlg.regression_fields.item(row, 0).text())
+                    if self.dlg.regression_fields.item(row, 2).checkState() == QtCore.Qt.Checked:
+                        categorical_fields.append(self.dlg.regression_fields.item(row, 0).text())
+
 
             # check if at least one field was chosen for the regression
             if len(selected_fields) == 0:
@@ -233,33 +232,29 @@ class gqisImmo:
                 return
 
             df = self.dlg.df
-            y = []
-            X = []
-            # iterate over rows
-            for index, row in df.iterrows():
-                # check if target field has a value
-                if not pd.isna(row[target_field]):
-                    # check all other selected fields in that row
-                    has_nan = False
-                    values = []
-                    for field in selected_fields:
-                        if pd.isna(df.at[index, field]):
-                            # print("row ", index, "column ", field, "is na")
-                            has_nan = True
-                        else:
-                            values.append(df.at[index, field])
-                    if not has_nan:
-                        # replace 'True' and 'False' by 1 and 0 and append to y
-                        if row[target_field] is True:
-                            y.append(1)
-                        elif row[target_field] is False:
-                            y.append(0)
-                        else:
-                            y.append(row[target_field])
+            y = pd.DataFrame(data=df[target_field], columns=[target_field])
 
-                        # replace 'True' and 'False' by 1 and 0
-                        values = [1 if x == np.True_ else 0 if x == np.False_ else x for x in values]
-                        # then append to X
-                        X.append(values)
+            # select columns in df
+            X = df[selected_fields]
+
+            # if columns are checked as categorical make column categorical datatype
+            for col in X:
+                if col in categorical_fields:
+                    X[col] = X[col].astype('category')
+
+            for index, row in y.iterrows():
+                # check if target field has a value
+                # drop from y and X if not
+                if pd.isna(row[target_field]):
+                    y.drop(index, inplace=True)
+                    X.drop(index, inplace=True)
+
+                # check all other selected fields in that row in X
+                for field in selected_fields:
+                    if pd.isna(X.at[index, field]):
+                        # drop from y and X
+                        y.drop(index, inplace=True)
+                        X.drop(index, inplace=True)
+                        break;
             print(y)
             print(X)
