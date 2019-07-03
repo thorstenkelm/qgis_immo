@@ -176,7 +176,7 @@ class TextMiner:
 counter = Counter()
 
 # import csv
-data = pd.read_csv("2019-04-09_123329_MietwohnungenEssen.csv", sep=";", header=0)
+data = pd.read_csv("2019-04-09_123329_Mietwohnungen.csv", sep=";", header=0)
 descArray = data['beschreibung']
 
 filter_file = open("Filter.txt", "r")
