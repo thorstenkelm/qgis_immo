@@ -18,7 +18,7 @@ df['Quartier'] = pd.Categorical(df.Quartier)
 #training and test split, random_State makes the training and test split reproducible
 df_train, df_test = train_test_split(df,test_size=0.2,random_state=24, shuffle=True)
 
-est = smf.ols(formula="Kaltmiete ~ Quartier + AnzZimmer + Wohnflaeche", data=df).fit()
+est = smf.ols(formula="Kaltmiete ~ Quartier + AnzZimmer + Wohnflaeche", data=df_train).fit()
 print(est.summary())
 
 # model values
