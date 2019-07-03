@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/plugins/real_estate_regression" >
-        <file>icon.png</file>
-    </qresource>
-</RCC>
