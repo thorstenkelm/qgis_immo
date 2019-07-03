@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/RegressionAnalysis" >
+    <qresource prefix="/plugins/qgis_immo" >
         <file>icon.png</file>
     </qresource>
 </RCC>

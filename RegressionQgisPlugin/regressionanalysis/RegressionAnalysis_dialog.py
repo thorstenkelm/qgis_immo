@@ -24,8 +24,11 @@
 
 import os
 
+import pandas as pd
+from PyQt5 import QtWidgets, QtCore
 from PyQt5 import uic
-from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QTableWidgetItem
+from qgis.core import QgsProject
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -33,6 +36,11 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class RegressionAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
+    fieldnames = None  # saves fieldnames
+    input_path = None  # saves input path
+    separator = ";"  # saves the separator, defaults to ";"
+    df = None  # saves the input csv as a pandas DataFrame
+
     def __init__(self, parent=None):
         """Constructor."""
         super(RegressionAnalysisDialog, self).__init__(parent)
@@ -42,3 +50,175 @@ class RegressionAnalysisDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+
+    def fill_combo_box_with_fieldnames(self):
+        """
+        This slot adds the fieldnames of the selected csv-file to the target field combo box.
+        It checks if the filepath points to a csv file. If not the user gets a warning.
+        """
+        input_path = self.input_file_path.text()
+        if os.path.isfile(input_path):
+            RegressionAnalysisDialog.df = pd.read_csv(input_path, sep=RegressionAnalysisDialog.separator)
+            # get fieldnames
+            fieldnames = list(RegressionAnalysisDialog.df.columns)
+
+            if self.target_field_combo.isEnabled() is False:
+                self.target_field_combo.setEnabled(True)
+
+            # clear previous input
+            self.target_field_combo.clear()
+
+            # update the combo box
+            for field in fieldnames:
+                self.target_field_combo.addItem(field)
+
+            # save input path for later use
+            RegressionAnalysisDialog.input_path = input_path
+            # save fieldnames for later use
+            RegressionAnalysisDialog.fieldnames = fieldnames
+
+            if self.regression_fields.isEnabled() == False:
+                self.regression_fields.setEnabled(True)
+
+            if self.numeric_fields.isChecked():
+                self.filter_numeric_fields()
+
+            self.fill_regression_fields()
+
+        else:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setWindowTitle("Warning")
+            msg.setText("The given filepath is not valid.")
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()  # show the messagebox
+
+    def fill_regression_fields(self):
+        """
+        Adds all fieldnames except the current target field name to regression_fields.
+        Adds two checkboxes after each fieldname. The first one indicates if this field should be used
+        for the regression. The second one indicates if this field should be used as categorical data.
+        """
+        # add columns and rows to regression_fields
+        self.regression_fields.setColumnCount(3)
+        self.regression_fields.setHorizontalHeaderLabels(["field", "use for regression", "is categorical"])
+        self.regression_fields.setRowCount(self.target_field_combo.count() - 1)
+
+        # for each field fill columns
+        target_passed = False
+        for index, field in enumerate(RegressionAnalysisDialog.fieldnames):
+            if field == self.target_field_combo.currentText():
+                target_passed = True
+            else:
+                col_1 = QTableWidgetItem(field)
+                col_2 = QTableWidgetItem()
+                col_3 = QTableWidgetItem()
+
+                col_2.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                col_2.setCheckState(QtCore.Qt.Unchecked)
+                col_3.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+                col_3.setCheckState(QtCore.Qt.Unchecked)
+
+                if target_passed:
+                    self.regression_fields.setItem(int(index) - 1, 0, col_1)
+                    self.regression_fields.setItem(int(index) - 1, 1, col_2)
+                    self.regression_fields.setItem(int(index) - 1, 2, col_3)
+                else:
+                    self.regression_fields.setItem(int(index), 0, col_1)
+                    self.regression_fields.setItem(int(index), 1, col_2)
+                    self.regression_fields.setItem(int(index), 2, col_3)
+
+        if self.numeric_fields.isEnabled() == False:
+            self.numeric_fields.setEnabled(True)
+
+        if self.numeric_fields.isChecked():
+            self.filter_numeric_fields()
+
+    def select_file(self):
+        # try to open the file selection dialog in the current project directory
+        # if no project is open it will default to the directory from which QGIS was opened
+        # filter is set to .csv files
+        project_dir = QgsProject.instance().absolutePath()
+        file_path = QFileDialog.getOpenFileName(self, "Open File", project_dir, "Text files (*.csv)")
+        # set file_path as text for the QLineEdit 'input_file_path'
+        # file_path is a tuple. The first element is the file path.
+        self.input_file_path.setText(file_path[0])
+
+    def filter_numeric_fields(self):
+        """
+        checks if numeric_fields is True or False.
+        If it is True this slot hides non numeric fields.
+        If it is False all currently hidden fields will be shown.
+        A field is non numeric as soon as one if the values in its rows is not a number or
+        can not be parsed to a number.
+        Empty values are allowed.
+        nan values are allowed.
+        """
+        if self.numeric_fields.isChecked() == True:
+            # remove non numeric fields from list view and combo box
+            # iterate over fields and check for each row if cell is numeric, empty or "NA"
+            print("filtered")
+            for col in RegressionAnalysisDialog.df:
+                numeric = True
+                for i, data in RegressionAnalysisDialog.df[col].iteritems():
+                    # if all cells are numeric, empty or "NA" field is numeric
+                    # if not field is not numeric
+                    if self.is_numeric(data) is False:
+                        numeric = False
+                if numeric is False:
+                    # remove non numeric fields from target field
+                    self.target_field_combo.removeItem(self.target_field_combo.findText(col))
+
+                    # remove non numeric fields from regression_fields
+                    for row in range(self.regression_fields.rowCount()):
+                        if self.regression_fields.item(row, 0).text() == col:
+                            self.regression_fields.removeRow(row)
+                            break
+        else:
+            # show all field names
+            print("all")
+            RegressionAnalysisDialog.fill_combo_box_with_fieldnames(self)
+            RegressionAnalysisDialog.fill_regression_fields(self)
+
+    def set_separator(self):
+        """
+        Slot that sets the separator to use when reading a csv file.
+        """
+        sender = self.sender()
+        if sender == self.comma_radio_btn:
+            RegressionAnalysisDialog.separator = ","
+        if sender == self.semicolon_radio_btn:
+            RegressionAnalysisDialog.separator = ";"
+        if sender == self.tab_radio_btn:
+            RegressionAnalysisDialog.separator = "\t"
+        if sender == self.space_radio_btn:
+            RegressionAnalysisDialog.separator = " "
+
+    def is_numeric(data):
+        """
+        checks if data is numeric.
+        :param data: the data to check
+        :return: true if data is numeric, false if data is not numeric
+        """
+        if isinstance(data, str):
+            data = data.replace(",", ".")
+            data = data.strip(" ")
+            try:
+                # try parsing to int
+                int(data)
+                return True
+            except ValueError:
+                try:
+                    # try parsing to float
+                    float(data)
+                    return True
+                except ValueError:
+                    return False
+                return False
+
+        elif isinstance(data, int):
+            return True
+        elif isinstance(data, float):
+            return True
+
+        return False
