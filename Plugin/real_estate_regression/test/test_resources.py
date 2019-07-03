@@ -8,9 +8,9 @@
 
 """
 
-__author__ = 'TODO'
-__date__ = '2019-06-19'
-__copyright__ = 'Copyright 2019, TODO'
+__author__ = 'thorsten.kelm@hs-bochum.de'
+__date__ = '2019-05-27'
+__copyright__ = 'Copyright 2019, Thorsten Kelm, Hochschule Bochum'
 
 import unittest
 
@@ -18,7 +18,7 @@ from PyQt5.QtGui import QIcon
 
 
 
-class gqisImmoDialogTest(unittest.TestCase):
+class RealEstateRegressionDialogTest(unittest.TestCase):
     """Test rerources work."""
 
     def setUp(self):
@@ -31,12 +31,12 @@ class gqisImmoDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/gqisImmo/icon.png'
+        path = ':/plugins/RealEstateRegression/icon.png'
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(gqisImmoResourcesTest)
+    suite = unittest.makeSuite(RealEstateRegressionResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
 

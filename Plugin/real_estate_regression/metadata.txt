@@ -7,17 +7,17 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=QGIS Immo
+name=Real Estate Regression
 qgisMinimumVersion=3.0
-description=TODO
+description=Plugin to execute regression for real estate
 version=0.1
-author=TODO
-email=TODO
+author=Thorsten Kelm, Hochschule Bochum
+email=thorsten.kelm@hs-bochum.de
 
-about=TODO
+about=Provide a brief description of the plugin and its purpose.
 
 tracker=http://bugs
-repository=https://github.com/thorstenkelm/qgis_immo
+repository=http://repo
 # End of mandatory metadata
 
 # Recommended items:
@@ -26,13 +26,13 @@ repository=https://github.com/thorstenkelm/qgis_immo
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=python 
+tags=python
 
-homepage=https://github.com/thorstenkelm/qgis_immo
+homepage=http://homepage
 category=Plugins
 icon=icon.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False

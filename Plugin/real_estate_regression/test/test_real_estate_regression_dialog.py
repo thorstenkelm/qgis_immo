@@ -8,26 +8,26 @@
 
 """
 
-__author__ = 'TODO'
-__date__ = '2019-06-19'
-__copyright__ = 'Copyright 2019, TODO'
+__author__ = 'thorsten.kelm@hs-bochum.de'
+__date__ = '2019-05-27'
+__copyright__ = 'Copyright 2019, Thorsten Kelm, Hochschule Bochum'
 
 import unittest
 
 from PyQt5.QtGui import QDialogButtonBox, QDialog
 
-from qgis_immo_dialog import gqisImmoDialog
+from real_estate_regression_dialog import RealEstateRegressionDialog
 
 from utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 
 
-class gqisImmoDialogTest(unittest.TestCase):
+class RealEstateRegressionDialogTest(unittest.TestCase):
     """Test dialog works."""
 
     def setUp(self):
         """Runs before each test."""
-        self.dialog = gqisImmoDialog(None)
+        self.dialog = RealEstateRegressionDialog(None)
 
     def tearDown(self):
         """Runs after each test."""
@@ -49,7 +49,7 @@ class gqisImmoDialogTest(unittest.TestCase):
         self.assertEqual(result, QDialog.Rejected)
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(gqisImmoDialogTest)
+    suite = unittest.makeSuite(RealEstateRegressionDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
 
