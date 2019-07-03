@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/RegressionAnalysis" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
