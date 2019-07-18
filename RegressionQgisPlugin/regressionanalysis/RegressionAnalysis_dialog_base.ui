@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>gqisImmoDialogBase</class>
- <widget class="QDialog" name="gqisImmoDialogBase">
+ <class>RegressionAnalysisDialogBase</class>
+ <widget class="QDialog" name="RegressionAnalysisDialogBase">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>521</width>
-    <height>656</height>
+       <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>QGIS Immo</string>
+   <string>RegressionAnalysis</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_5">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QGroupBox" name="input_group_box">
+          <property name="toolTip">
+              <string>Select an input file</string>
+          </property>
        <property name="title">
         <string>Input</string>
        </property>
@@ -40,7 +43,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>enter the path to a csv file here</string>
+                 <string>Enter the path to a CSV-file here</string>
              </property>
              <property name="toolTipDuration">
               <number>-1</number>
@@ -62,20 +65,23 @@
            <item>
             <widget class="QPushButton" name="input_select_file">
              <property name="toolTip">
-              <string>select a csv-file from the file system</string>
+                 <string>Select a CSV-file from the file system</string>
              </property>
              <property name="toolTipDuration">
               <number>-1</number>
              </property>
              <property name="text">
-              <string>...</string>
+                 <string>…</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="get_fields_button">
+                <property name="toolTip">
+                    <string>Get the column names</string>
+                </property>
              <property name="text">
-              <string>get fields</string>
+                 <string>Get fields</string>
              </property>
             </widget>
            </item>
@@ -109,12 +115,18 @@
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QGroupBox" name="groupBox">
+                <property name="toolTip">
+                    <string>Select the field separator to use when reading the CSV-file</string>
+                </property>
              <property name="title">
-              <string>field separator</string>
+                 <string>Field separator</string>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
                <widget class="QRadioButton" name="comma_radio_btn">
+                   <property name="toolTip">
+                       <string>set comma as the field separator in the CSV-file</string>
+                   </property>
                 <property name="text">
                  <string>Comma</string>
                 </property>
@@ -122,6 +134,9 @@
               </item>
               <item>
                <widget class="QRadioButton" name="semicolon_radio_btn">
+                   <property name="toolTip">
+                       <string>set semicolon as the field separator in the CSV-file</string>
+                   </property>
                 <property name="text">
                  <string>Semicolon</string>
                 </property>
@@ -132,6 +147,9 @@
               </item>
               <item>
                <widget class="QRadioButton" name="tab_radio_btn">
+                   <property name="toolTip">
+                       <string>set tab as the field separator in the CSV-file</string>
+                   </property>
                 <property name="text">
                  <string>Tab</string>
                 </property>
@@ -139,6 +157,9 @@
               </item>
               <item>
                <widget class="QRadioButton" name="space_radio_btn">
+                   <property name="toolTip">
+                       <string>set space as the field separator in the CSV-file</string>
+                   </property>
                 <property name="text">
                  <string>Space</string>
                 </property>
@@ -171,6 +192,9 @@
      </item>
      <item>
       <widget class="QGroupBox" name="parameter_group_box">
+          <property name="toolTip">
+              <string>Parameter section for the regression analysis</string>
+          </property>
        <property name="title">
         <string>Parameter</string>
        </property>
@@ -193,13 +217,13 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>the field that contains the target value of the regression analysis</string>
+                 <string>The field that contains the target value of the regression analysis</string>
              </property>
              <property name="toolTipDuration">
               <number>-1</number>
              </property>
              <property name="text">
-              <string>target field</string>
+                 <string>Target field</string>
              </property>
             </widget>
            </item>
@@ -227,7 +251,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>the field that contains the target value of the regression analysis</string>
+                 <string>The field that contains the target value of the regression analysis</string>
              </property>
              <property name="toolTipDuration">
               <number>-1</number>
@@ -260,66 +284,25 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_6">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
+            <widget class="QGroupBox" name="group_box_2">
+                <property name="toolTip">
+                    <string>Fields to use as parameters for the regression analysis</string>
+                </property>
+                <property name="title">
+                    <string>Regression fields</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QLabel" name="fields_for_regression_label">
-             <property name="text">
-              <string>fields to use for regression</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QFrame" name="frame_3">
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_6">
-              <item>
-               <widget class="QListView" name="regression_fields">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>select the fields that should be used for the regression analysis</string>
-                </property>
-                <property name="editTriggers">
-                 <set>QAbstractItemView::NoEditTriggers</set>
-                </property>
-                <property name="alternatingRowColors">
-                 <bool>true</bool>
-                </property>
-                <property name="selectionMode">
-                 <enum>QAbstractItemView::MultiSelection</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>90</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
+               <widget class="QTableWidget" name="regression_fields">
+                   <property name="toolTip">
+                       <string>Fields to use as parameters for the regression analysis</string>
+                   </property>
+                   <property name="editTriggers">
+                       <set>QAbstractItemView::NoEditTriggers</set>
+                   </property>
+                   <property name="selectionMode">
+                       <enum>QAbstractItemView::NoSelection</enum>
+                   </property>
             </widget>
            </item>
           </layout>
@@ -348,14 +331,17 @@
                <height>16777215</height>
               </size>
              </property>
+                <property name="toolTip">
+                    <string>Show fields with a numeric or boolean value</string>
+                </property>
              <property name="text">
-              <string>show numeric fields only</string>
+                 <string>Show numeric fields only</string>
              </property>
              <property name="checkable">
               <bool>true</bool>
              </property>
              <property name="checked">
-              <bool>true</bool>
+                 <bool>false</bool>
              </property>
              <property name="autoRepeat">
               <bool>false</bool>
@@ -382,65 +368,12 @@
          </widget>
         </item>
         <item>
-         <widget class="QFrame" name="frame_4">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <widget class="QCheckBox" name="save_fields">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>300</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>save currently selected fields for next use</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <property name="autoRepeat">
-              <bool>false</bool>
-             </property>
-             <property name="tristate">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>250</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
          <widget class="QDialogButtonBox" name="button_box">
+             <property name="toolTip">
+                 <string>Start the regression analysis or close the plugin</string>
+             </property>
           <property name="standardButtons">
-           <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+              <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
           </property>
           <property name="centerButtons">
            <bool>false</bool>
@@ -457,14 +390,13 @@
  <tabstops>
   <tabstop>target_field_combo</tabstop>
   <tabstop>numeric_fields</tabstop>
-  <tabstop>save_fields</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>get_fields_button</sender>
    <signal>clicked()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>fill_combo_box_with_fieldnames()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -480,7 +412,7 @@
   <connection>
    <sender>input_select_file</sender>
    <signal>clicked()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>select_file()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -496,8 +428,8 @@
   <connection>
    <sender>target_field_combo</sender>
    <signal>activated(QString)</signal>
-   <receiver>gqisImmoDialogBase</receiver>
-   <slot>fill_list_view_with_fieldnames()</slot>
+   <receiver>RegressionAnalysisDialogBase</receiver>
+      <slot>fill_regression_fields()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>241</x>
@@ -512,7 +444,7 @@
   <connection>
    <sender>numeric_fields</sender>
    <signal>stateChanged(int)</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>filter_numeric_fields()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -528,7 +460,7 @@
   <connection>
    <sender>comma_radio_btn</sender>
    <signal>clicked()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>set_separator()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -544,7 +476,7 @@
   <connection>
    <sender>semicolon_radio_btn</sender>
    <signal>clicked()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>set_separator()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -560,7 +492,7 @@
   <connection>
    <sender>tab_radio_btn</sender>
    <signal>clicked()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>set_separator()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -576,7 +508,7 @@
   <connection>
    <sender>space_radio_btn</sender>
    <signal>clicked()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>set_separator()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -592,7 +524,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>accepted()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -608,7 +540,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>rejected()</signal>
-   <receiver>gqisImmoDialogBase</receiver>
+   <receiver>RegressionAnalysisDialogBase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

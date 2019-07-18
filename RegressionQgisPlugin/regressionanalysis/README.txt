@@ -1,10 +1,10 @@
 Plugin Builder Results
 
-Your plugin gqisImmo was created in:
-    I:/_Studium/6_Semester/GI-Projekt Immobilien/qgis_immo/Regression\qgis_immo
+Your plugin RegressionAnalysis was created in:
+    C:/Users/Kelm/sciebo/Arbeit/Lehre/SoSe19_GI-Projekt_Immobilien/DevProject/RegressionQgisPlugin\regressionanalysis
 
 Your QGIS plugin directory is located at:
-    C:/Users/Tim/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins
+    C:/Users/Kelm/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins
 
 What's Next:
 
@@ -17,11 +17,11 @@ What's Next:
 
   * Test the plugin by enabling it in the QGIS plugin manager
 
-  * Customize it by editing the implementation file: ``qgis_immo.py``
+  * Customize it by editing the implementation file: ``RegressionAnalysis.py``
 
   * Create your own custom icon, replacing the default icon.png
 
-  * Modify your user interface by opening gqisImmo_dialog_base.ui in Qt Designer
+  * Modify your user interface by opening RegressionAnalysis_dialog_base.ui in Qt Designer
 
   * You can use the Makefile to compile your Ui and resource files when
     you make changes. This requires GNU make (gmake)
