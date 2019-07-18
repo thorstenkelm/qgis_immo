@@ -105,6 +105,7 @@ class TextMiner:
         tags = []
         for sent in text:
             tags += tagger.tag_text(sent, tagonly=True)
+
         tags = treetaggerwrapper.make_tags(tags)
 
         # filter nouns
@@ -189,5 +190,4 @@ tm = TextMiner(data=descArray,
                most_common_length=most_common_length)
 
 result = tm.execute
-print(type(result))
 print(result)
